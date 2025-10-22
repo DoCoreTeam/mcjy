@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#111827" />
-    <title>압도적 불맛 미친제육</title>
+    <title>압도적 불맛 미친제육 입니다.</title>
     <meta name="description" content="전화 한 번, 앱 한 번으로 우리 가게에 바로 연결!" />
     
     <!-- 네이버지도 API -->
@@ -126,7 +126,7 @@
         border: 2px solid #f59e0b;
         border-radius: 16px;
         padding: 16px;
-        margin: 8px 0;
+        margin: 0;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -361,7 +361,379 @@
         transform: rotate(180deg);
       }
 
+      /* 메인 액션 버튼들 (5:5 비율) */
+      .main-actions {
+        display: flex;
+        gap: 12px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .main-actions .btn {
+        flex: 1;
+        min-width: 140px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 16px 12px;
+        gap: 8px;
+      }
+
+      .main-actions .btn .icon {
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+
+      .main-actions .btn .label {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .main-actions .btn .sub {
+        font-size: 12px;
+        opacity: 0.9;
+        line-height: 1.2;
+      }
+
+      /* 메뉴 버튼 스타일 */
+      .btn-menu {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        transition: all 0.2s ease;
+      }
+
+      .btn-menu:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+      }
+
+      /* 할인 섹션 스타일 */
+      .discount-section {
+        margin: 20px 0;
+      }
+
+      /* 모달 스타일 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 16px;
+        max-width: 95vw;
+        max-height: 95vh;
+        overflow: hidden;
+        position: relative;
+        animation: slideUp 0.3s ease;
+        width: 100%;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+      }
+
+      .modal-close:hover {
+        background: #f3f4f6;
+        color: #111827;
+      }
+
+      .modal-body {
+        padding: 0;
+        text-align: center;
+      }
+
+      .modal-image {
+        width: 100%;
+        height: auto;
+        max-height: 70vh;
+        object-fit: contain;
+        display: block;
+      }
+
+      /* 메뉴 모달 푸터 */
+      .modal-footer {
+        padding: 16px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: center;
+      }
+
+      .menu-call-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        min-width: 200px;
+      }
+
+      .menu-call-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+      }
+
+      .menu-call-icon {
+        font-size: 20px;
+      }
+
+      .menu-call-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .menu-call-title {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+
+      .menu-call-desc {
+        font-size: 14px;
+        opacity: 0.9;
+        line-height: 1.2;
+      }
+
+      .call-options {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        animation: modalSlideUp 0.3s ease;
+        min-width: 280px;
+        max-width: 90vw;
+      }
+
+      .call-options.show {
+        display: block;
+      }
+
+      .call-options-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .call-options-overlay.show {
+        display: block;
+      }
+
+      .call-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f3f4f6;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .call-option:last-child {
+        border-bottom: none;
+      }
+
+      .call-option:hover {
+        background: #f8f9fa;
+      }
+
+      .call-option-icon {
+        font-size: 20px;
+      }
+
+      .call-option-text {
+        flex: 1;
+        text-align: left;
+      }
+
+      .call-option-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 2px;
+      }
+
+      .call-option-desc {
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      @keyframes slideDown {
+        from { transform: translateY(-10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      @keyframes modalSlideUp {
+        from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+
       footer { margin-top: 16px; text-align: center; color: var(--muted); font-size: 12px; }
+
+      /* 반응형 디자인 */
+      @media (max-width: 480px) {
+        .main-actions {
+          flex-direction: column;
+          gap: 8px;
+        }
+        
+        .main-actions .btn {
+          min-width: auto;
+          padding: 14px 12px;
+        }
+        
+        .main-actions .btn .label {
+          font-size: 13px;
+        }
+        
+        .main-actions .btn .sub {
+          font-size: 11px;
+        }
+
+        .menu-call-btn {
+          min-width: auto;
+          padding: 14px 20px;
+          font-size: 15px;
+        }
+
+        .menu-call-title {
+          font-size: 15px;
+        }
+
+        .menu-call-desc {
+          font-size: 13px;
+        }
+
+        /* 모바일 메뉴 모달 최적화 */
+        .modal {
+          padding: 10px;
+        }
+
+        .modal-content {
+          max-width: 100vw;
+          max-height: 100vh;
+          border-radius: 8px;
+        }
+
+        .modal-header {
+          padding: 12px 16px;
+        }
+
+        .modal-title {
+          font-size: 16px;
+        }
+
+        .modal-image {
+          max-height: 75vh;
+          width: 100%;
+        }
+
+        .modal-footer {
+          padding: 12px 16px;
+        }
+
+        .menu-call-btn {
+          width: 100%;
+          justify-content: center;
+          padding: 16px;
+        }
+      }
+
+      /* 매우 작은 화면 (iPhone SE 등) */
+      @media (max-width: 375px) {
+        .modal-image {
+          max-height: 80vh;
+        }
+
+        .modal-header {
+          padding: 10px 12px;
+        }
+
+        .modal-footer {
+          padding: 10px 12px;
+        }
+
+        .menu-call-btn {
+          padding: 14px;
+          font-size: 14px;
+        }
+      }
 
       @media (prefers-reduced-motion: reduce) {
         .btn:hover { transform: none; }
@@ -381,10 +753,15 @@
         <p>전화·앱 한 번으로 바로 주문하세요</p>
       </header>
 
-      <section class="grid" aria-label="빠른 연결">
-        <!-- 1) 가장 잘 보이는 상단: 전화걸기 -->
-        <!-- TODO: 전화번호를 변경하세요 (하이픈 포함 가능). -->
-        <a class="btn btn-call" href="tel:031-569-1011" aria-label="가게로 전화하기 031-569-1011">
+      <!-- 메인 액션 버튼들 (5:5 비율) -->
+      <section class="main-actions" aria-label="메인 액션">
+        <button class="btn btn-menu" onclick="showMenu()">
+          <span class="icon" aria-hidden="true">📋</span>
+          <span class="label">메뉴판 보기</span>
+          <span class="sub">메뉴 확인</span>
+        </button>
+        
+        <div class="btn btn-call" onclick="showCallOptions()" aria-label="가게로 전화하기 031-569-1011">
           <span class="icon" aria-hidden="true">
             <!-- phone icon -->
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -393,9 +770,11 @@
           </span>
           <span class="label">가게로 전화하기</span>
           <span class="sub">031-569-1011</span>
-        </a>
+        </div>
+      </section>
 
-        <!-- 전화 주문 할인 안내 -->
+      <!-- 전화 주문 할인 안내 -->
+      <section class="discount-section" aria-label="전화 주문 할인 안내">
         <div class="discount-card">
           <div class="discount-icon">🎉</div>
           <div class="discount-content">
@@ -408,6 +787,9 @@
             </button>
           </div>
         </div>
+      </section>
+
+      <section class="grid" aria-label="배달 앱 연결">
 
         <!-- 2) 땡겨요 바로가기 (준비중) -->
         <div class="btn btn-ttaeng btn-disabled" aria-label="땡겨요 서비스 준비중">
@@ -487,6 +869,47 @@
         <div>© <span id="year"></span> 디스크밤 컴퍼니. All rights reserved.</div>
       </footer>
     </main>
+
+    <!-- 메뉴 모달 -->
+    <div class="modal" id="menuModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">미친제육 메뉴판</div>
+          <button class="modal-close" onclick="closeMenu()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <img src="images/menu.jpeg" alt="미친제육 메뉴판" class="modal-image">
+        </div>
+        <div class="modal-footer">
+          <button class="menu-call-btn" onclick="callStore()">
+            <span class="menu-call-icon">📞</span>
+            <span class="menu-call-text">
+              <span class="menu-call-title">바로 전화 주문하기</span>
+              <span class="menu-call-desc">031-569-1011</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 전화 옵션 모달 -->
+    <div class="call-options-overlay" id="callOptionsOverlay" onclick="closeCallOptions()"></div>
+    <div class="call-options" id="callOptions">
+      <div class="call-option" onclick="showMenu()">
+        <span class="call-option-icon">📋</span>
+        <div class="call-option-text">
+          <div class="call-option-title">메뉴 보기</div>
+          <div class="call-option-desc">메뉴판을 먼저 확인해보세요</div>
+        </div>
+      </div>
+      <div class="call-option" onclick="callStore()">
+        <span class="call-option-icon">📞</span>
+        <div class="call-option-text">
+          <div class="call-option-title">바로 전화하기</div>
+          <div class="call-option-desc">031-569-1011로 바로 연결</div>
+        </div>
+      </div>
+    </div>
 
     <script>
       // 연도 자동 반영
@@ -589,6 +1012,60 @@
           toggleBtn.querySelector('span:nth-child(2)').textContent = '픽업 안내 보기';
         }
       }
+
+      // 전화 옵션 표시 함수
+      function showCallOptions() {
+        const callOptions = document.getElementById('callOptions');
+        const overlay = document.getElementById('callOptionsOverlay');
+        callOptions.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+      }
+
+      // 전화 옵션 닫기 함수
+      function closeCallOptions() {
+        const callOptions = document.getElementById('callOptions');
+        const overlay = document.getElementById('callOptionsOverlay');
+        callOptions.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.style.overflow = 'auto'; // 스크롤 복원
+      }
+
+      // 메뉴 모달 표시 함수
+      function showMenu() {
+        const menuModal = document.getElementById('menuModal');
+        menuModal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+      }
+
+      // 메뉴 모달 닫기 함수
+      function closeMenu() {
+        const menuModal = document.getElementById('menuModal');
+        menuModal.classList.remove('show');
+        document.body.style.overflow = 'auto'; // 스크롤 복원
+      }
+
+      // 바로 전화하기 함수
+      function callStore() {
+        window.location.href = 'tel:031-569-1011';
+      }
+
+      // 모달 외부 클릭 시 닫기
+      document.addEventListener('click', function(event) {
+        const menuModal = document.getElementById('menuModal');
+        
+        if (event.target === menuModal) {
+          closeMenu();
+        }
+      });
+
+      // ESC 키로 모달 닫기
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          closeMenu();
+          closeCallOptions();
+        }
+      });
     </script>
   </body>
 </html>
