@@ -85,7 +85,8 @@
 
       /* 각 버튼 색상 - 서비스 아이덴티티 컬러 반영 */
       .btn-call { background: linear-gradient(135deg, #22c55e, #16a34a); } /* 전화 - 초록색 유지 */
-      .btn-ttaeng { background: linear-gradient(135deg, #ff3e00, #e63900); } /* 땡겨요 - 주황/빨강 */
+      .btn-yogiyo { background: linear-gradient(135deg, #E53254, #D91E47); } /* 요기요 - 브랜드 컬러 */
+      .btn-ttaeng { background: linear-gradient(135deg, #ff3e00, #e63900); } /* 땡겨요 - 빨간색 */
       .btn-baemin { background: linear-gradient(135deg, #1FCFCD, #1AB5B3); } /* 배달의민족 - 민트블루 */
       .btn-coupang { background: linear-gradient(135deg, #8A5530, #6B4225); } /* 쿠팡이츠 - 브라운 */
 
@@ -417,9 +418,8 @@
         margin: 20px 0;
       }
 
-      /* 모달 스타일 */
+      /* 모달 스타일 - 안드로이드 최적화 */
       .modal {
-        display: none;
         position: fixed;
         top: 0;
         left: 0;
@@ -427,7 +427,13 @@
         height: 100%;
         background: rgba(0, 0, 0, 0.8);
         z-index: 1000;
-        animation: fadeIn 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateZ(0); /* 하드웨어 가속 */
+        -webkit-transform: translateZ(0);
+        will-change: opacity, visibility;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        display: none;
       }
 
       .modal.show {
@@ -435,6 +441,8 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
+        opacity: 1;
+        visibility: visible;
       }
 
       .modal-content {
@@ -444,8 +452,18 @@
         max-height: 95vh;
         overflow: hidden;
         position: relative;
-        animation: slideUp 0.3s ease;
+        transform: translateY(20px) translateZ(0);
+        -webkit-transform: translateY(20px) translateZ(0);
+        opacity: 0;
+        will-change: transform, opacity;
+        transition: transform 0.3s ease, opacity 0.3s ease;
         width: 100%;
+      }
+
+      .modal.show .modal-content {
+        transform: translateY(0) translateZ(0);
+        -webkit-transform: translateY(0) translateZ(0);
+        opacity: 1;
       }
 
       .modal-header {
@@ -495,6 +513,50 @@
         max-height: 70vh;
         object-fit: contain;
         display: block;
+        opacity: 1;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: opacity;
+        transition: opacity 0.3s ease;
+        /* 안드로이드 렌더링 최적화 */
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-perspective: 1000;
+        perspective: 1000;
+      }
+
+      /* 메뉴 이미지 로딩 스피너 */
+      .image-loading {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+        background: #f8f9fa;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e9ecef;
+        border-top: 3px solid #0ea5e9;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg) translateZ(0); }
+        100% { transform: rotate(360deg) translateZ(0); }
+      }
+
+      /* 안드로이드 특화 최적화 */
+      @media screen and (-webkit-min-device-pixel-ratio: 1) {
+        .modal-image {
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
+        }
       }
 
       /* 메뉴 모달 푸터 */
@@ -791,6 +853,16 @@
 
       <section class="grid" aria-label="배달 앱 연결">
 
+        <!-- 1) 요기요 바로가기 -->
+        <a class="btn btn-yogiyo" href="https://yogiyo.onelink.me/BlI7/bl8y6z8s" target="_blank" rel="noopener" aria-label="요기요에서 우리 가게 바로가기">
+          <span class="icon" aria-hidden="true">
+            <!-- 요기요 로고 -->
+            <img src="images/ygy.svg" alt="요기요 로고" width="28" height="28">
+          </span>
+          <span class="label">요기요 바로가기</span>
+          <span class="sub">앱/웹 열기</span>
+        </a>
+
         <!-- 2) 땡겨요 바로가기 (준비중) -->
         <div class="btn btn-ttaeng btn-disabled" aria-label="땡겨요 서비스 준비중">
           <span class="icon" aria-hidden="true">
@@ -878,7 +950,10 @@
           <button class="modal-close" onclick="closeMenu()">&times;</button>
         </div>
         <div class="modal-body">
-          <img src="images/menu.jpeg" alt="미친제육 메뉴판" class="modal-image">
+          <div class="image-loading" id="imageLoading" style="display: none;">
+            <div class="loading-spinner"></div>
+          </div>
+          <img src="images/menu.jpeg" alt="미친제육 메뉴판" class="modal-image" id="menuImage" style="display: block;">
         </div>
         <div class="modal-footer">
           <button class="menu-call-btn" onclick="callStore()">
@@ -895,7 +970,7 @@
     <!-- 전화 옵션 모달 -->
     <div class="call-options-overlay" id="callOptionsOverlay" onclick="closeCallOptions()"></div>
     <div class="call-options" id="callOptions">
-      <div class="call-option" onclick="showMenu()">
+      <div class="call-option" onclick="closeCallOptions(); showMenu();">
         <span class="call-option-icon">📋</span>
         <div class="call-option-text">
           <div class="call-option-title">메뉴 보기</div>
@@ -912,8 +987,101 @@
     </div>
 
     <script>
-      // 연도 자동 반영
-      document.getElementById('year').textContent = new Date().getFullYear();
+      // 전역 변수 및 상태 관리
+      let isMenuModalOpen = false;
+      let isCallOptionsOpen = false;
+      let androidOptimized = false;
+
+      // 안드로이드 브라우저 감지 함수
+      function isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+      }
+
+      // DOM 요소 안전하게 가져오기
+      function getElementById(id) {
+        const element = document.getElementById(id);
+        if (!element) {
+          console.error(`Element with id '${id}' not found`);
+        }
+        return element;
+      }
+
+      // 안드로이드 최적화 적용
+      function applyAndroidOptimizations() {
+        if (!isAndroid() || androidOptimized) return;
+        
+        try {
+          // 안드로이드에서 부드러운 스크롤 비활성화
+          document.documentElement.style.scrollBehavior = 'auto';
+          
+          // 안드로이드에서 하드웨어 가속 적용 (선택적)
+          const androidStyle = document.createElement('style');
+          androidStyle.id = 'android-optimizations';
+          androidStyle.textContent = `
+            .modal, .modal-content, .modal-image {
+              -webkit-transform: translateZ(0);
+              transform: translateZ(0);
+              -webkit-backface-visibility: hidden;
+              backface-visibility: hidden;
+            }
+          `;
+          document.head.appendChild(androidStyle);
+          
+          androidOptimized = true;
+          console.log('Android optimizations applied');
+        } catch (error) {
+          console.error('Failed to apply Android optimizations:', error);
+        }
+      }
+
+      // 이벤트 리스너 등록 - 정교한 구현
+      function setupEventListeners() {
+        // 모달 외부 클릭 시 닫기
+        document.addEventListener('click', function(event) {
+          try {
+            const menuModal = getElementById('menuModal');
+            if (menuModal && event.target === menuModal) {
+              closeMenu();
+            }
+          } catch (error) {
+            console.error('Error handling modal click:', error);
+          }
+        });
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(event) {
+          try {
+            if (event.key === 'Escape') {
+              if (isMenuModalOpen) closeMenu();
+              if (isCallOptionsOpen) closeCallOptions();
+            }
+          } catch (error) {
+            console.error('Error handling ESC key:', error);
+          }
+        });
+      }
+
+      // 연도 자동 반영 함수
+      function initYear() {
+        const yearElement = document.getElementById('year');
+        if (yearElement) {
+          yearElement.textContent = new Date().getFullYear();
+        }
+      }
+
+      // 페이지 초기화에 이벤트 리스너 추가
+      function initializePage() {
+        initYear();
+        applyAndroidOptimizations();
+        setupEventListeners();
+      }
+
+      // DOM 로드 완료 시 초기화
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializePage);
+      } else {
+        initializePage();
+      }
 
       // 네이버지도 API 초기화
       function initNaverMap() {
@@ -984,65 +1152,109 @@
         `;
       }
 
-      // 픽업 안내 토글 함수
+      // 픽업 안내 토글 함수 - 정교한 구현
       function togglePickupInfo() {
-        const pickupInfo = document.getElementById('pickup-info');
+        const pickupInfo = getElementById('pickup-info');
         const toggleBtn = document.querySelector('.pickup-toggle-btn');
-        const arrow = document.querySelector('.pickup-toggle-arrow');
         
-        if (pickupInfo.style.display === 'none') {
-          pickupInfo.style.display = 'block';
-          toggleBtn.classList.add('active');
-          toggleBtn.querySelector('span:nth-child(2)').textContent = '픽업 안내 숨기기';
+        if (!pickupInfo || !toggleBtn) {
+          console.error('Pickup info elements not found');
+          return;
+        }
+        
+        try {
+          const arrow = toggleBtn.querySelector('.pickup-toggle-arrow');
+          const textSpan = toggleBtn.querySelector('span:nth-child(2)');
           
-          // 픽업 안내 섹션으로 부드럽게 스크롤
-          setTimeout(() => {
-            pickupInfo.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start' 
-            });
-            // 지도 초기화 (토글 시에만)
-            if (typeof naver !== 'undefined') {
-              initNaverMap();
-            }
-          }, 100);
-        } else {
-          pickupInfo.style.display = 'none';
-          toggleBtn.classList.remove('active');
-          toggleBtn.querySelector('span:nth-child(2)').textContent = '픽업 안내 보기';
+          if (pickupInfo.style.display === 'none' || !pickupInfo.style.display) {
+            // 픽업 정보 표시
+            pickupInfo.style.display = 'block';
+            toggleBtn.classList.add('active');
+            if (textSpan) textSpan.textContent = '픽업 안내 숨기기';
+            
+            // 부드러운 스크롤 및 지도 초기화
+            setTimeout(() => {
+              pickupInfo.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+              });
+              
+              // 지도 초기화 (토글 시에만)
+              if (typeof naver !== 'undefined') {
+                initNaverMap();
+              }
+            }, 100);
+          } else {
+            // 픽업 정보 숨기기
+            pickupInfo.style.display = 'none';
+            toggleBtn.classList.remove('active');
+            if (textSpan) textSpan.textContent = '픽업 안내 보기';
+          }
+        } catch (error) {
+          console.error('Error toggling pickup info:', error);
         }
       }
 
-      // 전화 옵션 표시 함수
+      // 전화 옵션 표시 함수 - 정교한 구현
       function showCallOptions() {
-        const callOptions = document.getElementById('callOptions');
-        const overlay = document.getElementById('callOptionsOverlay');
-        callOptions.classList.add('show');
-        overlay.classList.add('show');
-        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+        if (isCallOptionsOpen) return; // 중복 실행 방지
+        
+        const callOptions = getElementById('callOptions');
+        const overlay = getElementById('callOptionsOverlay');
+        
+        if (!callOptions || !overlay) {
+          console.error('Call options elements not found');
+          return;
+        }
+        
+        try {
+          isCallOptionsOpen = true;
+          callOptions.classList.add('show');
+          overlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        } catch (error) {
+          console.error('Error showing call options:', error);
+          isCallOptionsOpen = false;
+        }
       }
 
-      // 전화 옵션 닫기 함수
+      // 전화 옵션 닫기 함수 - 정교한 구현
       function closeCallOptions() {
-        const callOptions = document.getElementById('callOptions');
-        const overlay = document.getElementById('callOptionsOverlay');
-        callOptions.classList.remove('show');
-        overlay.classList.remove('show');
-        document.body.style.overflow = 'auto'; // 스크롤 복원
+        if (!isCallOptionsOpen) return; // 중복 실행 방지
+        
+        const callOptions = getElementById('callOptions');
+        const overlay = getElementById('callOptionsOverlay');
+        
+        if (!callOptions || !overlay) {
+          console.error('Call options elements not found');
+          return;
+        }
+        
+        try {
+          isCallOptionsOpen = false;
+          callOptions.classList.remove('show');
+          overlay.classList.remove('show');
+          document.body.style.overflow = 'auto';
+        } catch (error) {
+          console.error('Error closing call options:', error);
+        }
       }
 
-      // 메뉴 모달 표시 함수
+      // 메뉴 모달 표시 함수 - 초간단 구현
       function showMenu() {
+        console.log('showMenu called');
+        
         const menuModal = document.getElementById('menuModal');
+        if (!menuModal) {
+          console.error('menuModal not found');
+          return;
+        }
+        
+        // 모달 표시
         menuModal.classList.add('show');
-        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
-      }
-
-      // 메뉴 모달 닫기 함수
-      function closeMenu() {
-        const menuModal = document.getElementById('menuModal');
-        menuModal.classList.remove('show');
-        document.body.style.overflow = 'auto'; // 스크롤 복원
+        document.body.style.overflow = 'hidden';
+        
+        console.log('Menu modal should be visible now');
       }
 
       // 바로 전화하기 함수
@@ -1050,22 +1262,31 @@
         window.location.href = 'tel:031-569-1011';
       }
 
-      // 모달 외부 클릭 시 닫기
-      document.addEventListener('click', function(event) {
-        const menuModal = document.getElementById('menuModal');
+      // 메뉴 모달 닫기 함수 - 초간단 구현
+      function closeMenu() {
+        console.log('closeMenu called');
         
-        if (event.target === menuModal) {
-          closeMenu();
+        const menuModal = document.getElementById('menuModal');
+        if (!menuModal) {
+          console.error('menuModal not found');
+          return;
         }
-      });
+        
+        // 모달 닫기
+        menuModal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        console.log('Menu modal should be hidden now');
+      }
 
-      // ESC 키로 모달 닫기
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-          closeMenu();
-          closeCallOptions();
+      // 바로 전화하기 함수 - 정교한 구현
+      function callStore() {
+        try {
+          window.location.href = 'tel:031-569-1011';
+        } catch (error) {
+          console.error('Error initiating phone call:', error);
         }
-      });
+      }
     </script>
   </body>
 </html>
