@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#111827" />
     <title>압도적 불맛 미친제육 입니다.</title>
     <meta name="description" content="전화 한 번, 앱 한 번으로 우리 가게에 바로 연결!" />
@@ -423,17 +423,20 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.8);
         z-index: 1000;
         opacity: 0;
         visibility: hidden;
-        transform: translateZ(0); /* 하드웨어 가속 */
-        -webkit-transform: translateZ(0);
-        will-change: opacity, visibility;
+        transform: translate3d(0, 0, 0); /* 3D 가속으로 안정화 */
+        -webkit-transform: translate3d(0, 0, 0);
+        will-change: opacity, visibility, transform;
         transition: opacity 0.3s ease, visibility 0.3s ease;
         display: none;
+        /* 안드로이드 뷰포트 고정 */
+        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
       }
 
       .modal.show {
@@ -443,6 +446,8 @@
         padding: 20px;
         opacity: 1;
         visibility: visible;
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
       }
 
       .modal-content {
@@ -514,15 +519,19 @@
         object-fit: contain;
         display: block;
         opacity: 1;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        will-change: opacity;
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+        will-change: opacity, transform;
         transition: opacity 0.3s ease;
         /* 안드로이드 렌더링 최적화 */
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
         -webkit-perspective: 1000;
         perspective: 1000;
+        /* 안드로이드 이미지 위치 고정 */
+        position: relative;
+        left: 0;
+        top: 0;
       }
 
       /* 메뉴 이미지 로딩 스피너 */
@@ -1240,7 +1249,7 @@
         }
       }
 
-      // 메뉴 모달 표시 함수 - 초간단 구현
+      // 메뉴 모달 표시 함수 - 안드로이드 최적화
       function showMenu() {
         console.log('showMenu called');
         
@@ -1250,9 +1259,17 @@
           return;
         }
         
+        // 안드로이드 뷰포트 고정
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
+        
         // 모달 표시
         menuModal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        
+        // 안드로이드 렌더링 강제 업데이트
+        menuModal.offsetHeight;
         
         console.log('Menu modal should be visible now');
       }
@@ -1262,7 +1279,7 @@
         window.location.href = 'tel:031-569-1011';
       }
 
-      // 메뉴 모달 닫기 함수 - 초간단 구현
+      // 메뉴 모달 닫기 함수 - 안드로이드 최적화
       function closeMenu() {
         console.log('closeMenu called');
         
@@ -1274,7 +1291,12 @@
         
         // 모달 닫기
         menuModal.classList.remove('show');
+        
+        // 안드로이드 뷰포트 복원
         document.body.style.overflow = 'auto';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
         
         console.log('Menu modal should be hidden now');
       }
