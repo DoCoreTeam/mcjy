@@ -21,13 +21,20 @@
       }
 
       * { box-sizing: border-box; }
-      html, body { height: 100%; }
-      body {
+      html, body { 
+        height: 100%;
         margin: 0;
+        padding: 0;
+      }
+      body {
         font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Apple SD Gothic Neo, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
         background: var(--bg);
         color: var(--fg);
         line-height: 1.5;
+        /* 안드로이드 모달 스크롤 문제 방지 */
+        position: relative;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
       }
 
       .container {
@@ -439,11 +446,15 @@
         position: fixed;
         top: 0;
         left: 0;
+        right: 0;
+        bottom: 0;
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.8);
         z-index: 1000;
         animation: fadeIn 0.3s ease;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .modal.show {
@@ -451,6 +462,19 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
+      }
+
+      /* body 스크롤 방지 (안드로이드 대응) */
+      body.modal-open {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        -webkit-overflow-scrolling: auto;
+        touch-action: none;
       }
 
       .modal-content {
@@ -576,10 +600,12 @@
         background: white;
         border-radius: 16px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        z-index: 1001;
+        z-index: 1002;
         animation: modalSlideUp 0.3s ease;
         min-width: 280px;
         max-width: 90vw;
+        max-height: 90vh;
+        overflow-y: auto;
       }
 
       .call-options.show {
@@ -591,11 +617,14 @@
         position: fixed;
         top: 0;
         left: 0;
+        right: 0;
+        bottom: 0;
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
+        z-index: 1001;
         animation: fadeIn 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
       }
 
       .call-options-overlay.show {
@@ -968,6 +997,9 @@
       // 컨텐츠 데이터를 저장할 전역 변수
       let contentData = null;
 
+      // 스크롤 위치 저장 변수
+      let scrollPosition = 0;
+
       // 연도 자동 반영
       document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -1205,13 +1237,27 @@
         }
       }
 
+      // 스크롤 잠금 (안드로이드 대응)
+      function lockScroll() {
+        scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        document.body.style.top = `-${scrollPosition}px`;
+        document.body.classList.add('modal-open');
+      }
+
+      // 스크롤 해제 (안드로이드 대응)
+      function unlockScroll() {
+        document.body.classList.remove('modal-open');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollPosition);
+      }
+
       // 전화 옵션 표시 함수
       function showCallOptions() {
         const callOptions = document.getElementById('callOptions');
         const overlay = document.getElementById('callOptionsOverlay');
+        lockScroll();
         callOptions.classList.add('show');
         overlay.classList.add('show');
-        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
       }
 
       // 전화 옵션 닫기 함수
@@ -1220,7 +1266,7 @@
         const overlay = document.getElementById('callOptionsOverlay');
         callOptions.classList.remove('show');
         overlay.classList.remove('show');
-        document.body.style.overflow = 'auto'; // 스크롤 복원
+        unlockScroll();
       }
 
       // 메뉴 모달 표시 함수
@@ -1229,15 +1275,15 @@
         closeCallOptions();
         
         const menuModal = document.getElementById('menuModal');
+        lockScroll();
         menuModal.classList.add('show');
-        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
       }
 
       // 메뉴 모달 닫기 함수
       function closeMenu() {
         const menuModal = document.getElementById('menuModal');
         menuModal.classList.remove('show');
-        document.body.style.overflow = 'auto'; // 스크롤 복원
+        unlockScroll();
       }
 
       // 바로 전화하기 함수
