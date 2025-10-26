@@ -736,6 +736,11 @@
         max-height: 280px;
         display: block;
         object-fit: contain; /* 비율 유지하면서 컨테이너에 맞춤 */
+        /* Safari 및 iOS 대응 */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
       }
 
       /* 모바일에서는 더 작게 */
@@ -746,6 +751,9 @@
         
         .video-section video {
           max-height: 220px;
+          /* iOS Safari 추가 대응 */
+          -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
         }
       }
 
@@ -887,7 +895,18 @@
 
       <!-- 프로모션 영상 섹션 -->
       <section class="video-section" id="promoVideo" aria-label="프로모션 영상">
-        <video id="videoPlayer" playsinline autoplay muted loop webkit-playsinline preload="auto">
+        <video 
+          id="videoPlayer" 
+          playsinline 
+          autoplay 
+          muted 
+          loop 
+          webkit-playsinline 
+          x-webkit-airplay="allow"
+          preload="auto"
+          disablePictureInPicture
+          controlslist="nodownload nofullscreen noremoteplayback"
+          style="object-fit: contain;">
           <source src="" type="video/mp4" id="videoSource">
           영상을 재생할 수 없습니다.
         </video>
@@ -1115,25 +1134,77 @@
         const videoPlayer = document.getElementById('videoPlayer');
         
         if (contentData.video.enabled && contentData.video.src) {
+          // 영상 속성 강제 설정 (모든 브라우저 호환성)
+          videoPlayer.setAttribute('playsinline', '');
+          videoPlayer.setAttribute('webkit-playsinline', '');
+          videoPlayer.setAttribute('muted', '');
+          videoPlayer.setAttribute('autoplay', '');
+          videoPlayer.setAttribute('loop', '');
+          videoPlayer.muted = true; // JavaScript에서도 명시적으로 설정
+          videoPlayer.playsInline = true;
+          videoPlayer.defaultMuted = true;
+          
           videoSource.src = contentData.video.src;
           videoSource.type = contentData.video.type;
           videoPlayer.load();
           videoSection.classList.add('has-video');
           
-          // 카카오톡/인앱 브라우저 자동재생 강제 시도
-          setTimeout(() => {
+          // 다단계 자동재생 시도 (Safari, Chrome, Firefox, 모바일 브라우저 모두 지원)
+          const attemptAutoplay = () => {
             const playPromise = videoPlayer.play();
+            
             if (playPromise !== undefined) {
-              playPromise.catch(error => {
-                console.log('자동 재생 실패 (사용자 인터랙션 필요):', error);
-                // 사용자가 화면 터치 시 재생 시도
-                document.addEventListener('touchstart', function playOnTouch() {
-                  videoPlayer.play();
-                  document.removeEventListener('touchstart', playOnTouch);
-                }, { once: true });
-              });
+              playPromise
+                .then(() => {
+                  console.log('영상 자동 재생 성공');
+                })
+                .catch(error => {
+                  console.log('자동 재생 1차 시도 실패, 재시도 중...', error);
+                  
+                  // 2차 시도: 약간의 지연 후 재시도
+                  setTimeout(() => {
+                    videoPlayer.play()
+                      .then(() => console.log('영상 자동 재생 성공 (2차 시도)'))
+                      .catch(() => {
+                        console.log('자동 재생 실패, 사용자 상호작용 대기 중');
+                        
+                        // 3차 시도: 사용자 터치/클릭 시 재생
+                        const playOnInteraction = () => {
+                          videoPlayer.play()
+                            .then(() => console.log('사용자 상호작용 후 재생 성공'))
+                            .catch(err => console.log('재생 실패:', err));
+                          document.removeEventListener('touchstart', playOnInteraction);
+                          document.removeEventListener('click', playOnInteraction);
+                          document.removeEventListener('scroll', playOnInteraction);
+                        };
+                        
+                        document.addEventListener('touchstart', playOnInteraction, { once: true });
+                        document.addEventListener('click', playOnInteraction, { once: true });
+                        document.addEventListener('scroll', playOnInteraction, { once: true });
+                      });
+                  }, 300);
+                });
             }
-          }, 500);
+          };
+          
+          // 즉시 시도
+          setTimeout(attemptAutoplay, 100);
+          
+          // Safari 대응: 추가 재시도
+          setTimeout(attemptAutoplay, 500);
+          setTimeout(attemptAutoplay, 1000);
+          
+          // IntersectionObserver를 사용한 뷰포트 진입 시 재생 (Safari 추가 대응)
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting && videoPlayer.paused) {
+                videoPlayer.play().catch(err => console.log('뷰포트 진입 시 재생 시도:', err));
+              }
+            });
+          }, { threshold: 0.5 });
+          
+          observer.observe(videoPlayer);
+          
         } else {
           videoSection.classList.remove('has-video');
         }
