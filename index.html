@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#111827" />
     <title>압도적 불맛 미친제육 입니다.</title>
     <meta name="description" content="전화 한 번, 앱 한 번으로 우리 가게에 바로 연결!" />
@@ -85,8 +85,7 @@
 
       /* 각 버튼 색상 - 서비스 아이덴티티 컬러 반영 */
       .btn-call { background: linear-gradient(135deg, #22c55e, #16a34a); } /* 전화 - 초록색 유지 */
-      .btn-yogiyo { background: linear-gradient(135deg, #E53254, #D91E47); } /* 요기요 - 브랜드 컬러 */
-      .btn-ttaeng { background: linear-gradient(135deg, #ff3e00, #e63900); } /* 땡겨요 - 빨간색 */
+      .btn-ttaeng { background: linear-gradient(135deg, #ff3e00, #e63900); } /* 땡겨요 - 주황/빨강 */
       .btn-baemin { background: linear-gradient(135deg, #1FCFCD, #1AB5B3); } /* 배달의민족 - 민트블루 */
       .btn-coupang { background: linear-gradient(135deg, #8A5530, #6B4225); } /* 쿠팡이츠 - 브라운 */
 
@@ -362,40 +361,56 @@
         transform: rotate(180deg);
       }
 
-      /* 메인 액션 버튼들 (5:5 비율) */
+      /* 메인 액션 버튼들 */
       .main-actions {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
         margin: 20px 0;
-        flex-wrap: wrap;
       }
 
       .main-actions .btn {
-        flex: 1;
-        min-width: 140px;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        text-align: center;
-        padding: 16px 12px;
-        gap: 8px;
+        gap: 12px;
+        padding: 18px 16px;
+        text-decoration: none;
+        min-height: 64px;
       }
 
       .main-actions .btn .icon {
-        font-size: 24px;
-        margin-bottom: 4px;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .main-actions .btn .icon svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .main-actions .btn .icon img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
       }
 
       .main-actions .btn .label {
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1.2;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.2px;
+        flex: 1;
       }
 
       .main-actions .btn .sub {
-        font-size: 12px;
-        opacity: 0.9;
-        line-height: 1.2;
+        font-size: 13px;
+        opacity: 0.95;
+        display: none;
       }
 
       /* 메뉴 버튼 스타일 */
@@ -418,25 +433,17 @@
         margin: 20px 0;
       }
 
-      /* 모달 스타일 - 안드로이드 최적화 */
+      /* 모달 스타일 */
       .modal {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         background: rgba(0, 0, 0, 0.8);
         z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transform: translate3d(0, 0, 0); /* 3D 가속으로 안정화 */
-        -webkit-transform: translate3d(0, 0, 0);
-        will-change: opacity, visibility, transform;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        display: none;
-        /* 안드로이드 뷰포트 고정 */
-        -webkit-overflow-scrolling: touch;
-        overflow: hidden;
+        animation: fadeIn 0.3s ease;
       }
 
       .modal.show {
@@ -444,10 +451,6 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
-        opacity: 1;
-        visibility: visible;
-        transform: translate3d(0, 0, 0);
-        -webkit-transform: translate3d(0, 0, 0);
       }
 
       .modal-content {
@@ -457,18 +460,8 @@
         max-height: 95vh;
         overflow: hidden;
         position: relative;
-        transform: translateY(20px) translateZ(0);
-        -webkit-transform: translateY(20px) translateZ(0);
-        opacity: 0;
-        will-change: transform, opacity;
-        transition: transform 0.3s ease, opacity 0.3s ease;
+        animation: slideUp 0.3s ease;
         width: 100%;
-      }
-
-      .modal.show .modal-content {
-        transform: translateY(0) translateZ(0);
-        -webkit-transform: translateY(0) translateZ(0);
-        opacity: 1;
       }
 
       .modal-header {
@@ -518,54 +511,6 @@
         max-height: 70vh;
         object-fit: contain;
         display: block;
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-        -webkit-transform: translate3d(0, 0, 0);
-        will-change: opacity, transform;
-        transition: opacity 0.3s ease;
-        /* 안드로이드 렌더링 최적화 */
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        -webkit-perspective: 1000;
-        perspective: 1000;
-        /* 안드로이드 이미지 위치 고정 */
-        position: relative;
-        left: 0;
-        top: 0;
-      }
-
-      /* 메뉴 이미지 로딩 스피너 */
-      .image-loading {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 200px;
-        background: #f8f9fa;
-      }
-
-      .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid #e9ecef;
-        border-top: 3px solid #0ea5e9;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-      }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg) translateZ(0); }
-        100% { transform: rotate(360deg) translateZ(0); }
-      }
-
-      /* 안드로이드 특화 최적화 */
-      @media screen and (-webkit-min-device-pixel-ratio: 1) {
-        .modal-image {
-          image-rendering: -webkit-optimize-contrast;
-          image-rendering: crisp-edges;
-        }
       }
 
       /* 메뉴 모달 푸터 */
@@ -717,24 +662,54 @@
 
       footer { margin-top: 16px; text-align: center; color: var(--muted); font-size: 12px; }
 
+      /* 영상 컨테이너 스타일 */
+      .video-section {
+        margin: 16px 0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: none; /* 영상이 없으면 숨김 */
+        max-height: 280px; /* 카드 섹션보다 작게 */
+        background: #000;
+      }
+
+      .video-section.has-video {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .video-section video {
+        width: 100%;
+        height: 100%;
+        max-height: 280px;
+        display: block;
+        object-fit: contain; /* 비율 유지하면서 컨테이너에 맞춤 */
+      }
+
+      /* 모바일에서는 더 작게 */
+      @media (max-width: 480px) {
+        .video-section {
+          max-height: 220px;
+        }
+        
+        .video-section video {
+          max-height: 220px;
+        }
+      }
+
       /* 반응형 디자인 */
       @media (max-width: 480px) {
         .main-actions {
-          flex-direction: column;
           gap: 8px;
         }
         
         .main-actions .btn {
-          min-width: auto;
           padding: 14px 12px;
         }
         
         .main-actions .btn .label {
-          font-size: 13px;
-        }
-        
-        .main-actions .btn .sub {
-          font-size: 11px;
+          font-size: 14px;
         }
 
         .menu-call-btn {
@@ -824,15 +799,14 @@
         <p>전화·앱 한 번으로 바로 주문하세요</p>
       </header>
 
-      <!-- 메인 액션 버튼들 (5:5 비율) -->
+      <!-- 메인 액션 버튼들 -->
       <section class="main-actions" aria-label="메인 액션">
-        <button class="btn btn-menu" onclick="showMenu()">
+        <a class="btn btn-menu" href="javascript:void(0)" onclick="showMenu()">
           <span class="icon" aria-hidden="true">📋</span>
           <span class="label">메뉴판 보기</span>
-          <span class="sub">메뉴 확인</span>
-        </button>
+        </a>
         
-        <div class="btn btn-call" onclick="showCallOptions()" aria-label="가게로 전화하기 031-569-1011">
+        <a class="btn btn-call" href="javascript:void(0)" onclick="showCallOptions()" aria-label="가게로 전화하기 031-569-1011">
           <span class="icon" aria-hidden="true">
             <!-- phone icon -->
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -841,7 +815,7 @@
           </span>
           <span class="label">가게로 전화하기</span>
           <span class="sub">031-569-1011</span>
-        </div>
+        </a>
       </section>
 
       <!-- 전화 주문 할인 안내 -->
@@ -860,17 +834,15 @@
         </div>
       </section>
 
-      <section class="grid" aria-label="배달 앱 연결">
+      <!-- 프로모션 영상 섹션 -->
+      <section class="video-section" id="promoVideo" aria-label="프로모션 영상">
+        <video id="videoPlayer" playsinline autoplay muted loop>
+          <source src="" type="video/mp4" id="videoSource">
+          영상을 재생할 수 없습니다.
+        </video>
+      </section>
 
-        <!-- 1) 요기요 바로가기 -->
-        <a class="btn btn-yogiyo" href="https://yogiyo.onelink.me/BlI7/bl8y6z8s" target="_blank" rel="noopener" aria-label="요기요에서 우리 가게 바로가기">
-          <span class="icon" aria-hidden="true">
-            <!-- 요기요 로고 -->
-            <img src="images/ygy.svg" alt="요기요 로고" width="28" height="28">
-          </span>
-          <span class="label">요기요 바로가기</span>
-          <span class="sub">앱/웹 열기</span>
-        </a>
+      <section class="grid" aria-label="배달 앱 연결">
 
         <!-- 2) 땡겨요 바로가기 (준비중) -->
         <div class="btn btn-ttaeng btn-disabled" aria-label="땡겨요 서비스 준비중">
@@ -959,10 +931,7 @@
           <button class="modal-close" onclick="closeMenu()">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="image-loading" id="imageLoading" style="display: none;">
-            <div class="loading-spinner"></div>
-          </div>
-          <img src="images/mcjymenu.jpeg" alt="미친제육 메뉴판" class="modal-image" id="menuImage" style="display: block;">
+          <img src="images/mcjymenu.jpeg" alt="미친제육 메뉴판" class="modal-image">
         </div>
         <div class="modal-footer">
           <button class="menu-call-btn" onclick="callStore()">
@@ -979,7 +948,7 @@
     <!-- 전화 옵션 모달 -->
     <div class="call-options-overlay" id="callOptionsOverlay" onclick="closeCallOptions()"></div>
     <div class="call-options" id="callOptions">
-      <div class="call-option" onclick="closeCallOptions(); showMenu();">
+      <div class="call-option" onclick="showMenu()">
         <span class="call-option-icon">📋</span>
         <div class="call-option-text">
           <div class="call-option-title">메뉴 보기</div>
@@ -996,101 +965,138 @@
     </div>
 
     <script>
-      // 전역 변수 및 상태 관리
-      let isMenuModalOpen = false;
-      let isCallOptionsOpen = false;
-      let androidOptimized = false;
+      // 컨텐츠 데이터를 저장할 전역 변수
+      let contentData = null;
 
-      // 안드로이드 브라우저 감지 함수
-      function isAndroid() {
-        return /Android/i.test(navigator.userAgent);
-      }
+      // 연도 자동 반영
+      document.getElementById('year').textContent = new Date().getFullYear();
 
-      // DOM 요소 안전하게 가져오기
-      function getElementById(id) {
-        const element = document.getElementById(id);
-        if (!element) {
-          console.error(`Element with id '${id}' not found`);
-        }
-        return element;
-      }
-
-      // 안드로이드 최적화 적용
-      function applyAndroidOptimizations() {
-        if (!isAndroid() || androidOptimized) return;
-        
+      // JSON 데이터 로드 및 페이지 렌더링
+      async function loadContent() {
         try {
-          // 안드로이드에서 부드러운 스크롤 비활성화
-          document.documentElement.style.scrollBehavior = 'auto';
-          
-          // 안드로이드에서 하드웨어 가속 적용 (선택적)
-          const androidStyle = document.createElement('style');
-          androidStyle.id = 'android-optimizations';
-          androidStyle.textContent = `
-            .modal, .modal-content, .modal-image {
-              -webkit-transform: translateZ(0);
-              transform: translateZ(0);
-              -webkit-backface-visibility: hidden;
-              backface-visibility: hidden;
+          // 서버가 실행 중이면 API를 통해, 아니면 직접 파일을 로드
+          let response;
+          try {
+            response = await fetch('/api/content');
+            const result = await response.json();
+            if (result.success) {
+              contentData = result.data;
+            } else {
+              throw new Error('API 응답 오류');
             }
-          `;
-          document.head.appendChild(androidStyle);
+          } catch (apiError) {
+            // API 실패 시 직접 파일 로드
+            response = await fetch('content.json');
+            contentData = await response.json();
+          }
           
-          androidOptimized = true;
-          console.log('Android optimizations applied');
+          // 페이지 컨텐츠 업데이트
+          updatePageContent();
+          
         } catch (error) {
-          console.error('Failed to apply Android optimizations:', error);
+          console.error('컨텐츠 로딩 실패:', error);
         }
       }
 
-      // 이벤트 리스너 등록 - 정교한 구현
-      function setupEventListeners() {
-        // 모달 외부 클릭 시 닫기
-        document.addEventListener('click', function(event) {
-          try {
-            const menuModal = getElementById('menuModal');
-            if (menuModal && event.target === menuModal) {
-              closeMenu();
-            }
-          } catch (error) {
-            console.error('Error handling modal click:', error);
-          }
-        });
+      // 페이지 컨텐츠 업데이트 함수
+      function updatePageContent() {
+        if (!contentData) return;
 
-        // ESC 키로 모달 닫기
-        document.addEventListener('keydown', function(event) {
-          try {
-            if (event.key === 'Escape') {
-              if (isMenuModalOpen) closeMenu();
-              if (isCallOptionsOpen) closeCallOptions();
-            }
-          } catch (error) {
-            console.error('Error handling ESC key:', error);
+        // 상단 로고 및 제목
+        document.querySelector('.logo img').src = contentData.store.logo;
+        document.querySelector('.logo img').alt = contentData.store.name + ' 로고';
+        document.querySelector('header h1').textContent = contentData.store.name;
+        document.querySelector('header p').textContent = contentData.store.description;
+        
+        // 전화번호 업데이트 (label만 업데이트)
+        const callButton = document.querySelector('.btn-call');
+        if (callButton) {
+          const labelSpan = callButton.querySelector('.label');
+          if (labelSpan) {
+            labelSpan.textContent = '가게로 전화하기';
           }
-        });
-      }
-
-      // 연도 자동 반영 함수
-      function initYear() {
-        const yearElement = document.getElementById('year');
-        if (yearElement) {
-          yearElement.textContent = new Date().getFullYear();
+          const subSpan = callButton.querySelector('.sub');
+          if (subSpan) {
+            subSpan.textContent = contentData.store.phone;
+          }
+          callButton.setAttribute('aria-label', `가게로 전화하기 ${contentData.store.phone}`);
         }
+
+        // 전화 주문 할인 정보
+        document.querySelector('.discount-icon').textContent = contentData.discount.icon;
+        document.querySelector('.discount-title').textContent = contentData.discount.title;
+        document.querySelector('.discount-desc').innerHTML = contentData.discount.description;
+
+        // 영상 업데이트
+        const videoSection = document.getElementById('promoVideo');
+        const videoSource = document.getElementById('videoSource');
+        const videoPlayer = document.getElementById('videoPlayer');
+        
+        if (contentData.video.enabled && contentData.video.src) {
+          videoSource.src = contentData.video.src;
+          videoSource.type = contentData.video.type;
+          videoPlayer.load();
+          videoSection.classList.add('has-video');
+        } else {
+          videoSection.classList.remove('has-video');
+        }
+
+        // 메뉴판 이미지
+        document.querySelector('.modal-image').src = contentData.menu.image;
+        document.querySelector('.modal-title').textContent = contentData.menu.title;
+
+        // 픽업 정보
+        document.querySelector('.pickup-title').textContent = contentData.pickup.title;
+        document.querySelector('.pickup-address strong').textContent = contentData.pickup.address;
+        document.querySelector('.pickup-detail').innerHTML = contentData.pickup.detailAddress;
+        document.querySelector('.pickup-note').textContent = contentData.pickup.note;
+        
+        // 지도 링크
+        document.querySelector('.map-naver').href = contentData.pickup.naverMapUrl;
+        document.querySelector('.map-tmap').href = contentData.pickup.tmapUrl;
+
+        // 배달 앱 버튼 업데이트
+        updateDeliveryApps();
+
+        // 푸터
+        const footerDiv = document.querySelector('footer div');
+        const year = new Date().getFullYear();
+        footerDiv.innerHTML = `© <span id="year">${year}</span> ${contentData.footer.company}. All rights reserved.`;
       }
 
-      // 페이지 초기화에 이벤트 리스너 추가
-      function initializePage() {
-        initYear();
-        applyAndroidOptimizations();
-        setupEventListeners();
+      // 배달 앱 버튼 업데이트
+      function updateDeliveryApps() {
+        const grid = document.querySelector('.grid[aria-label="배달 앱 연결"]');
+        grid.innerHTML = '';
+
+        contentData.deliveryApps.forEach(app => {
+          const btn = document.createElement(app.enabled ? 'a' : 'div');
+          btn.className = `btn ${app.enabled ? '' : 'btn-disabled'}`;
+          btn.style.background = app.bgColor;
+          
+          if (app.enabled) {
+            btn.href = app.url;
+            btn.target = '_blank';
+            btn.rel = 'noopener';
+            btn.setAttribute('aria-label', `${app.name}에서 우리 가게 바로가기`);
+          } else {
+            btn.setAttribute('aria-label', `${app.name} 서비스 준비중`);
+          }
+
+          btn.innerHTML = `
+            <span class="icon" aria-hidden="true">
+              <img src="${app.logo}" alt="${app.name} 로고" width="28" height="28">
+            </span>
+            <span class="label">${app.name} 바로가기</span>
+            <span class="sub">${app.status}</span>
+          `;
+
+          grid.appendChild(btn);
+        });
       }
 
-      // DOM 로드 완료 시 초기화
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializePage);
-      } else {
-        initializePage();
-      }
+      // 페이지 로드 시 컨텐츠 로드
+      window.addEventListener('DOMContentLoaded', loadContent);
 
       // 네이버지도 API 초기화
       function initNaverMap() {
@@ -1102,9 +1108,15 @@
             return;
           }
 
-          // 구리시 검배로60번길 27 좌표 (대략적인 위치)
+          if (!contentData) {
+            showFallbackMap();
+            return;
+          }
+
+          // JSON 데이터에서 좌표 가져오기
+          const { lat, lng } = contentData.pickup.location;
           const mapOptions = {
-            center: new naver.maps.LatLng(37.6038, 127.1434), // 구리시 중심 좌표
+            center: new naver.maps.LatLng(lat, lng),
             zoom: 15
           };
 
@@ -1112,14 +1124,14 @@
 
           // 마커 추가
           const marker = new naver.maps.Marker({
-            position: new naver.maps.LatLng(37.6038, 127.1434),
+            position: new naver.maps.LatLng(lat, lng),
             map: map,
-            title: '미친제육'
+            title: contentData.store.name
           });
 
           // 정보창 추가
           const infoWindow = new naver.maps.InfoWindow({
-            content: '<div style="padding: 10px;"><strong>미친제육</strong><br>구리시 검배로60번길 27, 1층 101호</div>'
+            content: `<div style="padding: 10px;"><strong>${contentData.store.name}</strong><br>${contentData.pickup.address}</div>`
           });
 
           // 마커 클릭 시 정보창 표시
@@ -1136,6 +1148,9 @@
       // 대체 지도 표시 (API 실패 시)
       function showFallbackMap() {
         const mapContainer = document.getElementById('naver-map');
+        const storeName = contentData ? contentData.store.name : '미친제육';
+        const address = contentData ? contentData.pickup.address : '구리시 검배로60번길 27, 1층 101호';
+        
         mapContainer.innerHTML = `
           <div style="
             width: 100%; 
@@ -1152,8 +1167,8 @@
             padding: 20px;
           ">
             <div style="font-size: 24px; margin-bottom: 10px;">📍</div>
-            <div style="font-weight: bold; margin-bottom: 8px;">미친제육</div>
-            <div style="font-size: 14px; margin-bottom: 12px;">구리시 검배로60번길 27, 1층 101호</div>
+            <div style="font-weight: bold; margin-bottom: 8px;">${storeName}</div>
+            <div style="font-size: 14px; margin-bottom: 12px;">${address}</div>
             <div style="font-size: 12px; color: #0c4a6e;">
               지도 로딩 중... 아래 버튼을 이용해주세요
             </div>
@@ -1161,154 +1176,92 @@
         `;
       }
 
-      // 픽업 안내 토글 함수 - 정교한 구현
+      // 픽업 안내 토글 함수
       function togglePickupInfo() {
-        const pickupInfo = getElementById('pickup-info');
+        const pickupInfo = document.getElementById('pickup-info');
         const toggleBtn = document.querySelector('.pickup-toggle-btn');
+        const arrow = document.querySelector('.pickup-toggle-arrow');
         
-        if (!pickupInfo || !toggleBtn) {
-          console.error('Pickup info elements not found');
-          return;
-        }
-        
-        try {
-          const arrow = toggleBtn.querySelector('.pickup-toggle-arrow');
-          const textSpan = toggleBtn.querySelector('span:nth-child(2)');
+        if (pickupInfo.style.display === 'none') {
+          pickupInfo.style.display = 'block';
+          toggleBtn.classList.add('active');
+          toggleBtn.querySelector('span:nth-child(2)').textContent = '픽업 안내 숨기기';
           
-          if (pickupInfo.style.display === 'none' || !pickupInfo.style.display) {
-            // 픽업 정보 표시
-            pickupInfo.style.display = 'block';
-            toggleBtn.classList.add('active');
-            if (textSpan) textSpan.textContent = '픽업 안내 숨기기';
-            
-            // 부드러운 스크롤 및 지도 초기화
-            setTimeout(() => {
-              pickupInfo.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-              });
-              
-              // 지도 초기화 (토글 시에만)
-              if (typeof naver !== 'undefined') {
-                initNaverMap();
-              }
-            }, 100);
-          } else {
-            // 픽업 정보 숨기기
-            pickupInfo.style.display = 'none';
-            toggleBtn.classList.remove('active');
-            if (textSpan) textSpan.textContent = '픽업 안내 보기';
-          }
-        } catch (error) {
-          console.error('Error toggling pickup info:', error);
+          // 픽업 안내 섹션으로 부드럽게 스크롤
+          setTimeout(() => {
+            pickupInfo.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start' 
+            });
+            // 지도 초기화 (토글 시에만)
+            if (typeof naver !== 'undefined') {
+              initNaverMap();
+            }
+          }, 100);
+        } else {
+          pickupInfo.style.display = 'none';
+          toggleBtn.classList.remove('active');
+          toggleBtn.querySelector('span:nth-child(2)').textContent = '픽업 안내 보기';
         }
       }
 
-      // 전화 옵션 표시 함수 - 정교한 구현
+      // 전화 옵션 표시 함수
       function showCallOptions() {
-        if (isCallOptionsOpen) return; // 중복 실행 방지
-        
-        const callOptions = getElementById('callOptions');
-        const overlay = getElementById('callOptionsOverlay');
-        
-        if (!callOptions || !overlay) {
-          console.error('Call options elements not found');
-          return;
-        }
-        
-        try {
-          isCallOptionsOpen = true;
-          callOptions.classList.add('show');
-          overlay.classList.add('show');
-          document.body.style.overflow = 'hidden';
-        } catch (error) {
-          console.error('Error showing call options:', error);
-          isCallOptionsOpen = false;
-        }
+        const callOptions = document.getElementById('callOptions');
+        const overlay = document.getElementById('callOptionsOverlay');
+        callOptions.classList.add('show');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
       }
 
-      // 전화 옵션 닫기 함수 - 정교한 구현
+      // 전화 옵션 닫기 함수
       function closeCallOptions() {
-        if (!isCallOptionsOpen) return; // 중복 실행 방지
-        
-        const callOptions = getElementById('callOptions');
-        const overlay = getElementById('callOptionsOverlay');
-        
-        if (!callOptions || !overlay) {
-          console.error('Call options elements not found');
-          return;
-        }
-        
-        try {
-          isCallOptionsOpen = false;
-          callOptions.classList.remove('show');
-          overlay.classList.remove('show');
-          document.body.style.overflow = 'auto';
-        } catch (error) {
-          console.error('Error closing call options:', error);
-        }
+        const callOptions = document.getElementById('callOptions');
+        const overlay = document.getElementById('callOptionsOverlay');
+        callOptions.classList.remove('show');
+        overlay.classList.remove('show');
+        document.body.style.overflow = 'auto'; // 스크롤 복원
       }
 
-      // 메뉴 모달 표시 함수 - 안드로이드 최적화
+      // 메뉴 모달 표시 함수
       function showMenu() {
-        console.log('showMenu called');
+        // 전화 옵션 모달이 열려있으면 먼저 닫기
+        closeCallOptions();
         
         const menuModal = document.getElementById('menuModal');
-        if (!menuModal) {
-          console.error('menuModal not found');
-          return;
-        }
-        
-        // 안드로이드 뷰포트 고정
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100%';
-        document.body.style.height = '100%';
-        
-        // 모달 표시
         menuModal.classList.add('show');
-        
-        // 안드로이드 렌더링 강제 업데이트
-        menuModal.offsetHeight;
-        
-        console.log('Menu modal should be visible now');
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 방지
+      }
+
+      // 메뉴 모달 닫기 함수
+      function closeMenu() {
+        const menuModal = document.getElementById('menuModal');
+        menuModal.classList.remove('show');
+        document.body.style.overflow = 'auto'; // 스크롤 복원
       }
 
       // 바로 전화하기 함수
       function callStore() {
-        window.location.href = 'tel:031-569-1011';
+        const phone = contentData ? contentData.store.phone : '031-569-1011';
+        window.location.href = 'tel:' + phone;
       }
 
-      // 메뉴 모달 닫기 함수 - 안드로이드 최적화
-      function closeMenu() {
-        console.log('closeMenu called');
-        
+      // 모달 외부 클릭 시 닫기
+      document.addEventListener('click', function(event) {
         const menuModal = document.getElementById('menuModal');
-        if (!menuModal) {
-          console.error('menuModal not found');
-          return;
+        
+        if (event.target === menuModal) {
+          closeMenu();
         }
-        
-        // 모달 닫기
-        menuModal.classList.remove('show');
-        
-        // 안드로이드 뷰포트 복원
-        document.body.style.overflow = 'auto';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-        
-        console.log('Menu modal should be hidden now');
-      }
+      });
 
-      // 바로 전화하기 함수 - 정교한 구현
-      function callStore() {
-        try {
-          window.location.href = 'tel:031-569-1011';
-        } catch (error) {
-          console.error('Error initiating phone call:', error);
+      // ESC 키로 모달 닫기
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          closeMenu();
+          closeCallOptions();
         }
-      }
+      });
     </script>
   </body>
 </html>

@@ -1,0 +1,71 @@
+{
+  "store": {
+    "name": "미친제육",
+    "description": "전화·앱 한 번으로 바로 주문하세요",
+    "phone": "031-569-1011",
+    "logo": "images/mcjy.png"
+  },
+  "menu": {
+    "image": "images/mcjymenu.jpeg",
+    "title": "미친제육 메뉴판"
+  },
+  "video": {
+    "enabled": true,
+    "src": "/videos/video-1761473375260-526283196.mp4",
+    "type": "video/mp4"
+  },
+  "discount": {
+    "icon": "🎉",
+    "title": "전화 주문 특가!",
+    "description": "가게 전화로 포장 주문 시 <br><strong>압도적 2,000원 할인 + 음료 1개 무료</strong>"
+  },
+  "pickup": {
+    "title": "픽업 장소 안내",
+    "address": "남양시장 바로 옆 골목 첫 블록, 1층 101호",
+    "detailAddress": "경기도 구리시 검배로60번길 27, 1층 101호<br>(지번: 구리시 수택동 474-1)",
+    "note": "💡 두 주소 모두 내비/지도에서 인식됩니다",
+    "location": {
+      "lat": 37.6038,
+      "lng": 127.1434
+    },
+    "naverMapUrl": "https://map.naver.com/v5/search/구리시 검배로60번길 27",
+    "tmapUrl": "https://tmapapi.sktelecom.com/main/app/web/routes?goalx=127.123456&goaly=37.123456&goalname=미친제육"
+  },
+  "deliveryApps": [
+    {
+      "name": "요기요",
+      "logo": "images/ygy.svg",
+      "url": "https://yogiyo.onelink.me/BlI7/bl8y6z8s",
+      "enabled": true,
+      "bgColor": "linear-gradient(135deg, #ff1744, #d01038)",
+      "status": "앱/웹 열기"
+    },
+    {
+      "name": "땡겨요",
+      "logo": "images/dgy.svg",
+      "url": "",
+      "enabled": false,
+      "bgColor": "linear-gradient(135deg, #ff3e00, #e63900)",
+      "status": "준비중"
+    },
+    {
+      "name": "배달의민족",
+      "logo": "images/bm.svg",
+      "url": "https://s.baemin.com/Qk000syLXjuxl",
+      "enabled": true,
+      "bgColor": "linear-gradient(135deg, #1FCFCD, #1AB5B3)",
+      "status": "앱/웹 열기"
+    },
+    {
+      "name": "쿠팡이츠",
+      "logo": "images/cpeat.png",
+      "url": "https://web.coupangeats.com/share?storeId=907487&dishId&key=91041190-074e-4f03-a897-b5a109ffc76a",
+      "enabled": true,
+      "bgColor": "linear-gradient(135deg, #8A5530, #6B4225)",
+      "status": "앱/웹 열기"
+    }
+  ],
+  "footer": {
+    "company": "디스크밤 컴퍼니"
+  }
+}
