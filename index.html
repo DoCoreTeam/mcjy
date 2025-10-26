@@ -873,7 +873,7 @@
 
       <!-- 프로모션 영상 섹션 -->
       <section class="video-section" id="promoVideo" aria-label="프로모션 영상">
-        <video id="videoPlayer" playsinline autoplay muted loop>
+        <video id="videoPlayer" playsinline autoplay muted loop webkit-playsinline preload="auto">
           <source src="" type="video/mp4" id="videoSource">
           영상을 재생할 수 없습니다.
         </video>
@@ -1014,6 +1014,9 @@
       // JSON 데이터 로드 및 페이지 렌더링
       async function loadContent() {
         try {
+          // 현재 스크롤 위치 저장 (컨텐츠 업데이트 후 복원용)
+          const savedScrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          
           // 서버가 실행 중이면 API를 통해, 아니면 직접 파일을 로드
           let response;
           try {
@@ -1032,6 +1035,13 @@
           
           // 페이지 컨텐츠 업데이트
           updatePageContent();
+          
+          // 스크롤 위치 복원 (레이아웃 변경으로 인한 자동 스크롤 방지)
+          setTimeout(() => {
+            if (savedScrollY > 0) {
+              window.scrollTo(0, savedScrollY);
+            }
+          }, 100);
           
         } catch (error) {
           console.error('컨텐츠 로딩 실패:', error);
@@ -1077,6 +1087,21 @@
           videoSource.type = contentData.video.type;
           videoPlayer.load();
           videoSection.classList.add('has-video');
+          
+          // 카카오톡/인앱 브라우저 자동재생 강제 시도
+          setTimeout(() => {
+            const playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(error => {
+                console.log('자동 재생 실패 (사용자 인터랙션 필요):', error);
+                // 사용자가 화면 터치 시 재생 시도
+                document.addEventListener('touchstart', function playOnTouch() {
+                  videoPlayer.play();
+                  document.removeEventListener('touchstart', playOnTouch);
+                }, { once: true });
+              });
+            }
+          }, 500);
         } else {
           videoSection.classList.remove('has-video');
         }
