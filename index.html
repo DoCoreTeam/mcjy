@@ -466,15 +466,23 @@
 
       /* body 스크롤 방지 (안드로이드 대응) */
       body.modal-open {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        -webkit-overflow-scrolling: auto;
-        touch-action: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        -webkit-overflow-scrolling: auto !important;
+        touch-action: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      body.modal-open .container {
+        position: relative;
+        height: auto;
       }
 
       .modal-content {
@@ -1237,18 +1245,37 @@
         }
       }
 
-      // 스크롤 잠금 (안드로이드 대응)
+      // 스크롤 잠금 (안드로이드 대응 - 강화 버전)
       function lockScroll() {
-        scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        document.body.style.top = `-${scrollPosition}px`;
+        // 현재 스크롤 위치 저장
+        scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        
+        // body에 modal-open 클래스 추가 (CSS에서 position: fixed 처리)
         document.body.classList.add('modal-open');
+        document.body.style.top = `-${scrollPosition}px`;
+        
+        // 추가 보험: html도 고정
+        document.documentElement.style.overflow = 'hidden';
+        document.documentElement.style.position = 'fixed';
+        document.documentElement.style.width = '100%';
+        document.documentElement.style.height = '100%';
       }
 
-      // 스크롤 해제 (안드로이드 대응)
+      // 스크롤 해제 (안드로이드 대응 - 강화 버전)
       function unlockScroll() {
+        // body 스타일 제거
         document.body.classList.remove('modal-open');
         document.body.style.top = '';
+        
+        // html 스타일 제거
+        document.documentElement.style.overflow = '';
+        document.documentElement.style.position = '';
+        document.documentElement.style.width = '';
+        document.documentElement.style.height = '';
+        
+        // 원래 스크롤 위치로 복원
         window.scrollTo(0, scrollPosition);
+        scrollPosition = 0;
       }
 
       // 전화 옵션 표시 함수
