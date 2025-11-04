@@ -1238,18 +1238,18 @@
         grid.innerHTML = '';
 
         contentData.deliveryApps.forEach(app => {
-          const btn = document.createElement(app.enabled ? 'a' : 'div');
-          btn.className = `btn ${app.enabled ? '' : 'btn-disabled'}`;
-          btn.style.background = app.bgColor;
-          
-          if (app.enabled) {
-            btn.href = app.url;
-            btn.target = '_blank';
-            btn.rel = 'noopener';
-            btn.setAttribute('aria-label', `${app.name}에서 우리 가게 바로가기`);
-          } else {
-            btn.setAttribute('aria-label', `${app.name} 서비스 준비중`);
+          // enabled가 false인 경우 버튼을 생성하지 않음
+          if (!app.enabled) {
+            return;
           }
+
+          const btn = document.createElement('a');
+          btn.className = 'btn';
+          btn.style.background = app.bgColor;
+          btn.href = app.url;
+          btn.target = '_blank';
+          btn.rel = 'noopener';
+          btn.setAttribute('aria-label', `${app.name}에서 우리 가게 바로가기`);
 
           btn.innerHTML = `
             <span class="icon" aria-hidden="true">

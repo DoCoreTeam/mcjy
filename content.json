@@ -36,33 +36,33 @@
       "name": "요기요",
       "logo": "images/ygy.svg",
       "url": "https://yogiyo.onelink.me/BlI7/bl8y6z8s",
-      "enabled": true,
+      "enabled": false,
       "bgColor": "linear-gradient(135deg, #ff1744, #d01038)",
-      "status": "앱/웹 열기"
+      "status": "준비중"
     },
     {
       "name": "땡겨요",
       "logo": "images/dgy.svg",
       "url": "",
-      "enabled": false,
+      "enabled": true,
       "bgColor": "linear-gradient(135deg, #ff3e00, #e63900)",
-      "status": "준비중"
+      "status": "앱/웹 열기"
     },
     {
       "name": "배달의민족",
       "logo": "images/bm.svg",
       "url": "https://s.baemin.com/Qk000syLXjuxl",
-      "enabled": true,
+      "enabled": false,
       "bgColor": "linear-gradient(135deg, #1FCFCD, #1AB5B3)",
-      "status": "앱/웹 열기"
+      "status": "준비중"
     },
     {
       "name": "쿠팡이츠",
       "logo": "images/cpeat.png",
       "url": "https://web.coupangeats.com/share?storeId=907487&dishId&key=91041190-074e-4f03-a897-b5a109ffc76a",
-      "enabled": true,
+      "enabled": false,
       "bgColor": "linear-gradient(135deg, #8A5530, #6B4225)",
-      "status": "앱/웹 열기"
+      "status": "준비중"
     }
   ],
   "footer": {
