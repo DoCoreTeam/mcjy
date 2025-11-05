@@ -44,9 +44,9 @@
       "name": "땡겨요",
       "logo": "images/dgy.svg",
       "url": "",
-      "enabled": true,
+      "enabled": false,
       "bgColor": "linear-gradient(135deg, #ff3e00, #e63900)",
-      "status": "앱/웹 열기"
+      "status": "준비중"
     },
     {
       "name": "배달의민족",
