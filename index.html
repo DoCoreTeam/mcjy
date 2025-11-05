@@ -586,11 +586,19 @@
         padding: 14px;
         margin-bottom: 12px;
         transition: all 0.2s ease;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
       }
 
       .menu-item:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         transform: translateY(-1px);
+      }
+
+      .menu-item-content {
+        flex: 1;
+        min-width: 0;
       }
 
       .menu-item-name {
@@ -612,6 +620,74 @@
         color: #6b7280;
         margin-bottom: 8px;
         line-height: 1.5;
+      }
+
+      .menu-item-media {
+        flex-shrink: 0;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .menu-item-media:hover {
+        transform: scale(1.05);
+      }
+
+      /* 이미지가 없는 경우에도 높이 유지 */
+      .menu-item:not(:has(.menu-item-media)) {
+        align-items: center;
+      }
+
+      .menu-item-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .menu-item-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        background: #000;
+      }
+
+      @media (max-width: 480px) {
+        .menu-item-media {
+          width: 100px;
+          height: 100px;
+        }
+      }
+
+      /* 이미지 확대 모달 */
+      .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        cursor: pointer;
+      }
+
+      .image-modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .image-modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 8px;
       }
 
       .menu-item-options {
@@ -1128,26 +1204,31 @@
     </main>
 
     <!-- 메뉴 모달 -->
-    <div class="modal" id="menuModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-title">미친제육 메뉴판</div>
-          <button class="modal-close" onclick="closeMenu()">&times;</button>
-        </div>
-        <div class="modal-body" id="menuModalBody">
-          <!-- 동적 메뉴가 여기에 렌더링됩니다 -->
-        </div>
-        <div class="modal-footer">
-          <button class="menu-call-btn" onclick="callStore()">
-            <span class="menu-call-icon">📞</span>
-            <span class="menu-call-text">
-              <span class="menu-call-title">바로 전화 주문하기</span>
-              <span class="menu-call-desc">031-569-1011</span>
-            </span>
-          </button>
+      <div class="modal" id="menuModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title">미친제육 메뉴판</div>
+            <button class="modal-close" onclick="closeMenu()">&times;</button>
+          </div>
+          <div class="modal-body" id="menuModalBody">
+            <!-- 동적 메뉴가 여기에 렌더링됩니다 -->
+          </div>
+          <div class="modal-footer">
+            <button class="menu-call-btn" onclick="callStore()">
+              <span class="menu-call-icon">📞</span>
+              <span class="menu-call-text">
+                <span class="menu-call-title">바로 전화 주문하기</span>
+                <span class="menu-call-desc">031-569-1011</span>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <!-- 이미지 확대 모달 -->
+      <div class="image-modal" id="imageModal" onclick="closeImageModal()">
+        <img class="image-modal-content" id="imageModalContent" src="" alt="확대된 이미지">
+      </div>
 
     <!-- 전화 옵션 모달 -->
     <div class="call-options-overlay" id="callOptionsOverlay" onclick="closeCallOptions()"></div>
@@ -1399,8 +1480,26 @@
           html += `<div class="menu-category">`;
           html += `<div class="menu-category-title">${category.name}</div>`;
 
-          category.items.forEach(item => {
+          category.items.forEach((item, itemIndex) => {
+            const uniqueId = `menu-item-${category.id}-${itemIndex}`;
             html += `<div class="menu-item">`;
+            
+            // 이미지 또는 동영상 표시 (좌측)
+            if (item.video) {
+              html += `<div class="menu-item-media">`;
+              html += `<video class="menu-item-video" controls playsinline>`;
+              html += `<source src="${item.video}" type="video/mp4">`;
+              html += `동영상을 재생할 수 없습니다.`;
+              html += `</video>`;
+              html += `</div>`;
+            } else if (item.image) {
+              html += `<div class="menu-item-media" onclick="openImageModal('${item.image}')">`;
+              html += `<img src="${item.image}" alt="${item.name}" class="menu-item-image">`;
+              html += `</div>`;
+            }
+            
+            // 텍스트 정보 (우측)
+            html += `<div class="menu-item-content">`;
             html += `<div class="menu-item-name">${item.name}</div>`;
             html += `<div class="menu-item-price">₩${item.price.toLocaleString()}</div>`;
             
@@ -1430,7 +1529,7 @@
               html += `</div>`;
             }
 
-            html += `</div>`;
+            html += `</div></div>`; // menu-item-content와 menu-item 닫기
           });
 
           html += `</div>`;
@@ -1669,8 +1768,25 @@
         if (event.key === 'Escape') {
           closeMenu();
           closeCallOptions();
+          closeImageModal();
         }
       });
+
+      // 이미지 확대 모달 열기
+      function openImageModal(imageSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalContent = document.getElementById('imageModalContent');
+        modalContent.src = imageSrc;
+        modal.classList.add('active');
+        lockScroll();
+      }
+
+      // 이미지 확대 모달 닫기
+      function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('active');
+        unlockScroll();
+      }
     </script>
   </body>
 </html>
