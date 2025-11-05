@@ -7,7 +7,348 @@
   },
   "menu": {
     "image": "images/mcjymenu.jpeg",
-    "title": "미친제육 메뉴판"
+    "title": "미친제육 메뉴판",
+    "useDynamicMenu": true,
+    "categories": [
+      {
+        "id": "1",
+        "name": "한끼뚝딱",
+        "items": [
+          {
+            "id": "1-1",
+            "name": "김치제육덮밥 + 미니된장찌개",
+            "price": 12000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": true
+          },
+          {
+            "id": "1-2",
+            "name": "간장제육덮밥 + 미니된장찌개",
+            "price": 12000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": true
+          },
+          {
+            "id": "1-3",
+            "name": "황태콩나물해장국 + 미니제육 + 후라이밥",
+            "price": 12000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "name": "제육1인세트",
+        "items": [
+          {
+            "id": "2-1",
+            "name": "직화제육+ 미니찌개 +후라이밥",
+            "price": 12900,
+            "description": "",
+            "options": [
+              {
+                "name": "불제육,콩나물제육",
+                "price": 1000
+              },
+              {
+                "name": "간장마늘제육",
+                "price": 1500
+              },
+              {
+                "name": "김치제육",
+                "price": 2000
+              }
+            ],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "name": "제육2인세트",
+        "items": [
+          {
+            "id": "3-1",
+            "name": "제육2인분 + 미니찌개2 + 후라이밥2",
+            "price": 24900,
+            "description": "",
+            "options": [
+              {
+                "name": "불제육,콩나물제육",
+                "price": 1000
+              },
+              {
+                "name": "간장마늘제육",
+                "price": 1500
+              },
+              {
+                "name": "김치제육",
+                "price": 2000
+              }
+            ],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "4",
+        "name": "제육2인정식",
+        "items": [
+          {
+            "id": "4-1",
+            "name": "직화제육2인분 + 큰찌개 + 후라이밥2 + 4종찬 + 쌈야채",
+            "price": 29900,
+            "description": "",
+            "options": [
+              {
+                "name": "불제육,콩나물제육",
+                "price": 1000
+              },
+              {
+                "name": "간장마늘제육",
+                "price": 1500
+              },
+              {
+                "name": "김치제육",
+                "price": 2000
+              }
+            ],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "5",
+        "name": "찌개세트",
+        "items": [
+          {
+            "id": "5-1",
+            "name": "직화제육+ 큰찌개 +후라이밥",
+            "price": 15900,
+            "description": "",
+            "options": [
+              {
+                "name": "칼칼뜨끈 된장찌개",
+                "price": 0
+              },
+              {
+                "name": "황태 콩나물 해장국",
+                "price": 0
+              }
+            ],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "6",
+        "name": "고기만",
+        "items": [
+          {
+            "id": "6-1",
+            "name": "직화 제육 볶음 - 한끼제육",
+            "price": 14900,
+            "description": "",
+            "options": [
+              {
+                "name": "불제육,콩나물제육",
+                "price": 1000
+              },
+              {
+                "name": "간장마늘제육",
+                "price": 1500
+              },
+              {
+                "name": "김치제육",
+                "price": 2000
+              }
+            ],
+            "toppingsAvailable": true
+          },
+          {
+            "id": "6-2",
+            "name": "직화 제육 볶음 - 두끼제육",
+            "price": 20900,
+            "description": "",
+            "options": [
+              {
+                "name": "불제육,콩나물제육",
+                "price": 1000
+              },
+              {
+                "name": "간장마늘제육",
+                "price": 1500
+              },
+              {
+                "name": "김치제육",
+                "price": 2000
+              }
+            ],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "7",
+        "name": "분식 / 술안주",
+        "items": [
+          {
+            "id": "7-1",
+            "name": "제육 떡볶이",
+            "price": 12000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": true
+          },
+          {
+            "id": "7-2",
+            "name": "불 폭탄치즈 제육 떡볶이",
+            "price": 15500,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": true
+          },
+          {
+            "id": "7-1762355688227",
+            "name": "두부김치 제육",
+            "price": 12000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": true
+          }
+        ]
+      },
+      {
+        "id": "8",
+        "name": "사이드",
+        "items": [
+          {
+            "id": "8-1",
+            "name": "계란찜",
+            "price": 3500,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "8-2",
+            "name": "쌈야채",
+            "price": 3400,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "8-3",
+            "name": "후라이밥",
+            "price": 1900,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "8-4",
+            "name": "비빔밥",
+            "price": 6900,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "8-5",
+            "name": "칼칼 된장찌개",
+            "price": 5900,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "8-6",
+            "name": "황태콩나물해장국",
+            "price": 5900,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          }
+        ]
+      },
+      {
+        "id": "9",
+        "name": "음료",
+        "items": [
+          {
+            "id": "9-1",
+            "name": "나랑드사이다 애플 제로 500ml",
+            "price": 1500,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "9-2",
+            "name": "코카콜라 500ml",
+            "price": 2000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "9-3",
+            "name": "제로콜라 500ml",
+            "price": 2000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "9-4",
+            "name": "칠성사이다 500ml",
+            "price": 2000,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          },
+          {
+            "id": "9-5",
+            "name": "쿨피스 복숭아맛 355ml",
+            "price": 1300,
+            "description": "",
+            "options": [],
+            "toppingsAvailable": false
+          }
+        ]
+      }
+    ],
+    "toppings": [
+      {
+        "name": "모짜렐라치즈",
+        "price": 1500
+      },
+      {
+        "name": "그릴소시지",
+        "price": 2000
+      },
+      {
+        "name": "떡사리",
+        "price": 1500
+      },
+      {
+        "name": "고기100G 추가",
+        "price": 3800
+      },
+      {
+        "name": "계란후라이",
+        "price": 1000
+      },
+      {
+        "name": "메추리알",
+        "price": 1000
+      }
+    ]
   },
   "video": {
     "enabled": true,

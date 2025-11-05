@@ -557,6 +557,140 @@
         display: block;
       }
 
+      /* 동적 메뉴판 스타일 */
+      .menu-list-container {
+        padding: 20px;
+        max-height: calc(95vh - 200px);
+        overflow-y: auto;
+        text-align: left;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .menu-category {
+        margin-bottom: 24px;
+      }
+
+      .menu-category-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f3f4f6;
+      }
+
+      .menu-item {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .menu-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
+      }
+
+      .menu-item-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 6px;
+      }
+
+      .menu-item-price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #f59e0b;
+        margin-bottom: 8px;
+      }
+
+      .menu-item-description {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+
+      .menu-item-options {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #f3f4f6;
+      }
+
+      .menu-option-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+
+      .menu-option-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .menu-option-item {
+        font-size: 12px;
+        color: #374151;
+        padding: 4px 8px;
+        background: #f9fafb;
+        border-radius: 6px;
+      }
+
+      .menu-option-price {
+        color: #f59e0b;
+        font-weight: 600;
+      }
+
+      .menu-toppings-note {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #f3f4f6;
+        font-style: italic;
+      }
+
+      .menu-toppings-list {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .menu-topping-item {
+        font-size: 11px;
+        color: #374151;
+        padding: 3px 6px;
+        background: #fef3c7;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 480px) {
+        .menu-list-container {
+          padding: 16px;
+        }
+
+        .menu-category-title {
+          font-size: 16px;
+        }
+
+        .menu-item {
+          padding: 12px;
+        }
+
+        .menu-item-name {
+          font-size: 15px;
+        }
+
+        .menu-item-price {
+          font-size: 16px;
+        }
+      }
+
       /* 메뉴 모달 푸터 */
       .modal-footer {
         padding: 16px 20px;
@@ -1000,8 +1134,8 @@
           <div class="modal-title">미친제육 메뉴판</div>
           <button class="modal-close" onclick="closeMenu()">&times;</button>
         </div>
-        <div class="modal-body">
-          <img src="images/mcjymenu.jpeg" alt="미친제육 메뉴판" class="modal-image">
+        <div class="modal-body" id="menuModalBody">
+          <!-- 동적 메뉴가 여기에 렌더링됩니다 -->
         </div>
         <div class="modal-footer">
           <button class="menu-call-btn" onclick="callStore()">
@@ -1209,9 +1343,8 @@
           videoSection.classList.remove('has-video');
         }
 
-        // 메뉴판 이미지
-        document.querySelector('.modal-image').src = contentData.menu.image;
-        document.querySelector('.modal-title').textContent = contentData.menu.title;
+        // 메뉴판 업데이트
+        updateMenuModal();
 
         // 픽업 정보
         document.querySelector('.pickup-title').textContent = contentData.pickup.title;
@@ -1230,6 +1363,81 @@
         const footerDiv = document.querySelector('footer div');
         const year = new Date().getFullYear();
         footerDiv.innerHTML = `© <span id="year">${year}</span> ${contentData.footer.company}. All rights reserved.`;
+      }
+
+      // 메뉴 모달 업데이트
+      function updateMenuModal() {
+        if (!contentData || !contentData.menu) return;
+
+        const modalBody = document.getElementById('menuModalBody');
+        const modalTitle = document.querySelector('#menuModal .modal-title');
+        
+        modalTitle.textContent = contentData.menu.title || '메뉴판';
+
+        // 동적 메뉴 사용 여부 확인
+        if (contentData.menu.useDynamicMenu && contentData.menu.categories && contentData.menu.categories.length > 0) {
+          // 동적 메뉴 렌더링
+          renderDynamicMenu(modalBody, contentData.menu);
+        } else {
+          // 기존 이미지 메뉴 표시
+          const img = document.createElement('img');
+          img.src = contentData.menu.image || 'images/mcjymenu.jpeg';
+          img.alt = contentData.menu.title || '메뉴판';
+          img.className = 'modal-image';
+          modalBody.innerHTML = '';
+          modalBody.appendChild(img);
+        }
+      }
+
+      // 동적 메뉴 렌더링 함수
+      function renderDynamicMenu(container, menuData) {
+        let html = '<div class="menu-list-container">';
+
+        menuData.categories.forEach(category => {
+          if (!category.items || category.items.length === 0) return;
+
+          html += `<div class="menu-category">`;
+          html += `<div class="menu-category-title">${category.name}</div>`;
+
+          category.items.forEach(item => {
+            html += `<div class="menu-item">`;
+            html += `<div class="menu-item-name">${item.name}</div>`;
+            html += `<div class="menu-item-price">₩${item.price.toLocaleString()}</div>`;
+            
+            if (item.description) {
+              html += `<div class="menu-item-description">${item.description}</div>`;
+            }
+
+            // 옵션 표시
+            if (item.options && item.options.length > 0) {
+              html += `<div class="menu-item-options">`;
+              html += `<div class="menu-option-label">선택 옵션:</div>`;
+              html += `<div class="menu-option-list">`;
+              item.options.forEach(option => {
+                const priceText = option.price > 0 ? ` <span class="menu-option-price">+₩${option.price.toLocaleString()}</span>` : '';
+                html += `<span class="menu-option-item">${option.name}${priceText}</span>`;
+              });
+              html += `</div></div>`;
+            }
+
+            // 토핑 안내
+            if (item.toppingsAvailable && menuData.toppings && menuData.toppings.length > 0) {
+              html += `<div class="menu-toppings-note">토핑 추가 가능</div>`;
+              html += `<div class="menu-toppings-list">`;
+              menuData.toppings.forEach(topping => {
+                html += `<span class="menu-topping-item">${topping.name} +₩${topping.price.toLocaleString()}</span>`;
+              });
+              html += `</div>`;
+            }
+
+            html += `</div>`;
+          });
+
+          html += `</div>`;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
       }
 
       // 배달 앱 버튼 업데이트
