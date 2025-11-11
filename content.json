@@ -410,10 +410,10 @@
     {
       "name": "땡겨요",
       "logo": "images/dgy.svg",
-      "url": "",
-      "enabled": false,
+      "url": "https://fdofd.ddangyo.com/gateway1.html?ugiCaL2",
+      "enabled": true,
       "bgColor": "linear-gradient(135deg, #ff3e00, #e63900)",
-      "status": "준비중"
+      "status": "앱/웹 열기"
     },
     {
       "name": "배달의민족",
