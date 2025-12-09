@@ -1792,10 +1792,16 @@
     <!-- Firebase Analytics & Firestore - User Journey Tracking -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
-      import { getFirestore, collection, addDoc, doc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+      import { getFirestore, collection, addDoc, doc, updateDoc, arrayUnion, serverTimestamp, increment, setDoc } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
 
       const firebaseConfig = {
-        // 여기에 값을 넣으세요
+        apiKey: "AIzaSyCYw0ENrKZoV8r1crAK9Ej4Ac15UgI9bqs",
+        authDomain: "mcjy-77dfa.firebaseapp.com",
+        projectId: "mcjy-77dfa",
+        storageBucket: "mcjy-77dfa.firebasestorage.app",
+        messagingSenderId: "408069861706",
+        appId: "1:408069861706:web:a3ef90bcc35ccc2c5511b3",
+        measurementId: "G-J7SLHLP7PH"
       };
 
       const app = initializeApp(firebaseConfig);
@@ -1874,16 +1880,50 @@
             target: target
           };
 
+          // daily_visits에 행동 추가
           const sessionRef = doc(db, 'daily_visits', sessionDocId);
           await updateDoc(sessionRef, {
             actions: arrayUnion(actionLog)
           });
+
+          // 통계 컬렉션에 카운트 증가
+          if (action === 'Clicked Menu' && target) {
+            // 메뉴 클릭 통계
+            const menuStatsRef = doc(db, 'menu_stats', 'clicks');
+            await updateDoc(menuStatsRef, {
+              [target]: increment(1)
+            }).catch(async () => {
+              // 문서가 없으면 생성
+              await setDoc(menuStatsRef, { [target]: 1 });
+            });
+          } else if (action === 'Clicked Button' && target) {
+            // 버튼 클릭 통계
+            const clickStatsRef = doc(db, 'click_stats', 'main_actions');
+            await updateDoc(clickStatsRef, {
+              [target]: increment(1)
+            }).catch(async () => {
+              // 문서가 없으면 생성
+              await setDoc(clickStatsRef, { [target]: 1 });
+            });
+          }
         } catch (error) {
           console.error('행동 로그 추가 오류:', error);
         }
       }
 
-      // 이미지 파일명으로 앱명 추출
+      // 이미지 파일명으로 앱 키 추출 (통계용)
+      function getAppKeyFromImage(imgSrc) {
+        if (!imgSrc) return null;
+        const filename = imgSrc.toLowerCase();
+        if (filename.includes('dgy')) return 'ttaengyo';
+        if (filename.includes('bm')) return 'baemin';
+        if (filename.includes('cpeat')) return 'coupang';
+        if (filename.includes('yogiyo') || filename.includes('ygy')) return 'yogiyo';
+        if (filename.includes('public') || filename.includes('special') || filename.includes('bdtg')) return 'public_delivery';
+        return null;
+      }
+
+      // 이미지 파일명으로 앱명 추출 (표시용)
       function getAppNameFromImage(imgSrc) {
         if (!imgSrc) return null;
         const filename = imgSrc.toLowerCase();
@@ -1922,16 +1962,18 @@
         if (btn) {
           const img = btn.querySelector('img');
           if (img && img.src) {
+            const appKey = getAppKeyFromImage(img.src);
             const appName = getAppNameFromImage(img.src);
-            if (appName) {
-              await logAction('Clicked Button', appName);
+            if (appKey && appName) {
+              // 통계용 키와 표시용 이름 모두 전달
+              await logAction('Clicked Button', appKey);
               return;
             }
           }
 
           // 전화 버튼 체크
           if (btn.classList.contains('btn-call') || btn.querySelector('svg')) {
-            await logAction('Clicked Button', '전화하기');
+            await logAction('Clicked Button', 'phone_call');
           }
         }
       });
