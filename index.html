@@ -1789,141 +1789,153 @@
       }
     </script>
 
-    <!-- Firebase Analytics & Firestore -->
+    <!-- Firebase Analytics & Firestore - User Journey Tracking -->
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
-      import { getFirestore, doc, setDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+      import { getFirestore, collection, addDoc, doc, updateDoc, arrayUnion, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
 
       const firebaseConfig = {
-        apiKey: "AIzaSyCYw0ENrKZoV8r1crAK9Ej4Ac15UgI9bqs",
-        authDomain: "mcjy-77dfa.firebaseapp.com",
-        projectId: "mcjy-77dfa",
-        storageBucket: "mcjy-77dfa.firebasestorage.app",
-        messagingSenderId: "408069861706",
-        appId: "1:408069861706:web:a3ef90bcc35ccc2c5511b3",
-        measurementId: "G-J7SLHLP7PH"
+        // 여기에 값을 넣으세요
       };
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+
+      let sessionDocId = null;
 
       function isMobileDevice() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
                (window.innerWidth <= 768 && window.innerWidth <= window.innerHeight);
       }
 
-      // 방문자 카운터 (sessionStorage 중복 방지)
-      async function trackVisit() {
+      function generateSessionId() {
+        return Date.now() + '-' + Math.random().toString(36).substring(2, 11);
+      }
+
+      function getTimeString() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+      }
+
+      // 세션 초기화 및 Firestore 문서 생성
+      async function initializeSession() {
         try {
-          if (sessionStorage.getItem('visit_tracked')) return;
-          sessionStorage.setItem('visit_tracked', 'true');
+          let sessionId = sessionStorage.getItem('sessionId');
+          const existingDocId = sessionStorage.getItem('sessionDocId');
 
-          const today = new Date().toISOString().split('T')[0];
-          const statsRef = doc(db, 'daily_stats', today);
-          const statsSnap = await getDoc(statsRef);
-
-          if (!document.referrer && isMobileDevice()) {
-            // QR 유입
-            if (statsSnap.exists()) {
-              await setDoc(statsRef, { qr_count: increment(1) }, { merge: true });
-            } else {
-              await setDoc(statsRef, { qr_count: 1, general_count: 0 });
-            }
-          } else {
-            // 일반 유입
-            if (statsSnap.exists()) {
-              await setDoc(statsRef, { general_count: increment(1) }, { merge: true });
-            } else {
-              await setDoc(statsRef, { qr_count: 0, general_count: 1 });
-            }
+          // 세션 ID가 없으면 생성
+          if (!sessionId) {
+            sessionId = generateSessionId();
+            sessionStorage.setItem('sessionId', sessionId);
           }
+
+          // 문서 ID가 있으면 재사용 (새로고침 방지)
+          if (existingDocId) {
+            sessionDocId = existingDocId;
+            return;
+          }
+
+          // QR 유입 판단
+          const isQR = !document.referrer && isMobileDevice();
+          const visitType = isQR ? 'QR' : 'Normal';
+          const deviceType = isMobileDevice() ? 'Mobile' : 'PC';
+
+          // Firestore에 세션 문서 생성
+          const docRef = await addDoc(collection(db, 'daily_visits'), {
+            sessionId: sessionId,
+            entryTime: serverTimestamp(),
+            type: visitType,
+            device: deviceType,
+            actions: []
+          });
+
+          sessionDocId = docRef.id;
+          sessionStorage.setItem('sessionDocId', sessionDocId);
         } catch (error) {
-          console.error('방문 추적 오류:', error);
+          console.error('세션 초기화 오류:', error);
         }
       }
 
-      // 이미지 파일명으로 앱 구분
-      function getAppKeyFromImage(imgSrc) {
+      // 행동 로그 추가
+      async function logAction(action, target) {
+        try {
+          if (!sessionDocId) {
+            await initializeSession();
+            if (!sessionDocId) return;
+          }
+
+          const time = getTimeString();
+          const actionLog = {
+            time: time,
+            action: action,
+            target: target
+          };
+
+          const sessionRef = doc(db, 'daily_visits', sessionDocId);
+          await updateDoc(sessionRef, {
+            actions: arrayUnion(actionLog)
+          });
+        } catch (error) {
+          console.error('행동 로그 추가 오류:', error);
+        }
+      }
+
+      // 이미지 파일명으로 앱명 추출
+      function getAppNameFromImage(imgSrc) {
         if (!imgSrc) return null;
         const filename = imgSrc.toLowerCase();
-        if (filename.includes('dgy')) return 'ttaengyo';
-        if (filename.includes('bm')) return 'baemin';
-        if (filename.includes('cpeat')) return 'coupang';
-        if (filename.includes('yogiyo') || filename.includes('ygy')) return 'yogiyo';
-        if (filename.includes('public') || filename.includes('special') || filename.includes('bdtg')) return 'public_delivery';
+        if (filename.includes('dgy')) return '땡겨요';
+        if (filename.includes('bm')) return '배달의민족';
+        if (filename.includes('cpeat')) return '쿠팡이츠';
+        if (filename.includes('yogiyo') || filename.includes('ygy')) return '요기요';
+        if (filename.includes('public') || filename.includes('special') || filename.includes('bdtg')) return '배달특급';
         return null;
       }
 
-      // 버튼 클릭 추적
-      async function trackButtonClick(appKey) {
-        try {
-          const clicksRef = doc(db, 'click_stats', 'main_actions');
-          const clicksSnap = await getDoc(clicksRef);
-          if (clicksSnap.exists()) {
-            await setDoc(clicksRef, { [appKey]: increment(1) }, { merge: true });
-          } else {
-            await setDoc(clicksRef, { [appKey]: 1 });
-          }
-        } catch (error) {
-          console.error('버튼 클릭 추적 오류:', error);
-        }
-      }
-
-      // 메뉴 클릭 추적
-      async function trackMenuClick(menuName) {
-        try {
-          const clicksRef = doc(db, 'menu_stats', 'clicks');
-          const clicksSnap = await getDoc(clicksRef);
-          if (clicksSnap.exists()) {
-            await setDoc(clicksRef, { [menuName]: increment(1) }, { merge: true });
-          } else {
-            await setDoc(clicksRef, { [menuName]: 1 });
-          }
-        } catch (error) {
-          console.error('메뉴 클릭 추적 오류:', error);
-        }
-      }
-
-      // 페이지 로드 시 방문 추적
+      // 페이지 로드 시 세션 초기화
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', trackVisit);
+        document.addEventListener('DOMContentLoaded', initializeSession);
       } else {
-        trackVisit();
+        initializeSession();
       }
 
       // 전역 클릭 이벤트 위임
       document.addEventListener('click', async (e) => {
-        const btn = e.target.closest('.btn');
-        if (!btn) return;
-
-        // 메뉴 아이템 클릭 체크
+        // 메뉴 아이템 클릭
         const menuItem = e.target.closest('.menu-item');
         if (menuItem) {
           const menuNameElement = menuItem.querySelector('.menu-item-name');
           if (menuNameElement) {
             const menuName = menuNameElement.textContent.trim();
             if (menuName) {
-              await trackMenuClick(menuName);
+              await logAction('Clicked Menu', menuName);
             }
           }
           return;
         }
 
-        // 버튼 클릭 추적
-        const img = btn.querySelector('img');
-        if (img && img.src) {
-          const appKey = getAppKeyFromImage(img.src);
-          if (appKey) {
-            await trackButtonClick(appKey);
-            return;
+        // 버튼 클릭
+        const btn = e.target.closest('.btn');
+        if (btn) {
+          const img = btn.querySelector('img');
+          if (img && img.src) {
+            const appName = getAppNameFromImage(img.src);
+            if (appName) {
+              await logAction('Clicked Button', appName);
+              return;
+            }
           }
-        }
 
-        // 전화 버튼 체크 (이미지 없거나 btn-call 클래스)
-        if (btn.classList.contains('btn-call') || btn.querySelector('svg')) {
-          await trackButtonClick('phone_call');
+          // 전화 버튼 체크
+          if (btn.classList.contains('btn-call') || btn.querySelector('svg')) {
+            await logAction('Clicked Button', '전화하기');
+          }
         }
       });
     </script>
   </body>
 </html>
+

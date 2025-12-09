@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>미친제육 - 사용자 행동 분석 대시보드</title>
+    
+    <style>
+      :root {
+        --primary: #0ea5e9;
+        --primary-dark: #0284c7;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --text: #1e293b;
+        --text-muted: #64748b;
+        --success: #22c55e;
+        --warning: #f59e0b;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .dashboard-container {
+        display: grid;
+        grid-template-columns: 350px 1fr 350px;
+        gap: 20px;
+        height: 100vh;
+        padding: 20px;
+      }
+
+      /* 왼쪽: 방문자 목록 */
+      .visitor-list {
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .visitor-list-header {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .visitor-list-header h2 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+
+      .visitor-list-header .subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .visitor-list-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+      }
+
+      .visitor-item {
+        padding: 16px;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--bg);
+      }
+
+      .visitor-item:hover {
+        background: #e0f2fe;
+        border-color: var(--primary);
+      }
+
+      .visitor-item.active {
+        background: #dbeafe;
+        border-color: var(--primary);
+      }
+
+      .visitor-item-time {
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--text);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .visitor-item-info {
+        font-size: 13px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 6px;
+      }
+
+      .visitor-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .badge-qr {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .badge-normal {
+        background: #e0f2fe;
+        color: #0c4a6e;
+      }
+
+      .badge-mobile {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .badge-pc {
+        background: #e0e7ff;
+        color: #3730a3;
+      }
+
+      .action-count {
+        font-weight: 600;
+        color: var(--primary);
+      }
+
+      /* 가운데: 상세 행동 타임라인 */
+      .timeline-container {
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* 오른쪽: 통계 정보 */
+      .stats-container {
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .stats-header {
+        padding: 20px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .stats-header h2 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+
+      .stats-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8fafc;
+      }
+
+      .stats-section {
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .stats-section h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--text);
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border);
+      }
+
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .stat-item:last-child {
+        border-bottom: none;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .stat-value {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .stat-value-large {
+        font-size: 24px;
+      }
+
+      .stats-empty {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+      }
+
+      .timeline-header {
+        padding: 20px;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .timeline-header h2 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+
+      .timeline-header .session-info {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .timeline-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #f8fafc;
+      }
+
+      .timeline-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+        font-size: 16px;
+        text-align: center;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .timeline-item {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .timeline-line {
+        width: 3px;
+        background: linear-gradient(to bottom, var(--primary), #cbd5e1);
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
+
+      .timeline-dot {
+        width: 12px;
+        height: 12px;
+        background: var(--primary);
+        border: 3px solid white;
+        border-radius: 50%;
+        margin-top: 4px;
+        margin-left: -4.5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .timeline-content-item {
+        flex: 1;
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 3px solid var(--primary);
+      }
+
+      .timeline-time {
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      .timeline-action {
+        font-size: 16px;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+
+      .timeline-target {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .action-icon {
+        display: inline-block;
+        margin-right: 6px;
+      }
+
+      /* 스크롤바 스타일 */
+      .visitor-list-content::-webkit-scrollbar,
+      .timeline-content::-webkit-scrollbar,
+      .stats-content::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .visitor-list-content::-webkit-scrollbar-track,
+      .timeline-content::-webkit-scrollbar-track,
+      .stats-content::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+
+      .visitor-list-content::-webkit-scrollbar-thumb,
+      .timeline-content::-webkit-scrollbar-thumb,
+      .stats-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+
+      .visitor-list-content::-webkit-scrollbar-thumb:hover,
+      .timeline-content::-webkit-scrollbar-thumb:hover,
+      .stats-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      @media (max-width: 1400px) {
+        .dashboard-container {
+          grid-template-columns: 300px 1fr;
+        }
+        .stats-container {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- 왼쪽: 방문자 목록 -->
+      <div class="visitor-list">
+        <div class="visitor-list-header">
+          <h2>📊 오늘의 방문자</h2>
+          <div class="subtitle" id="visitorCount">0명</div>
+        </div>
+        <div class="visitor-list-content" id="visitorList">
+          <!-- 방문자 목록이 여기에 동적으로 추가됨 -->
+        </div>
+      </div>
+
+      <!-- 가운데: 상세 행동 타임라인 -->
+      <div class="timeline-container">
+        <div class="timeline-header">
+          <h2>📋 행동 타임라인</h2>
+          <div class="session-info" id="sessionInfo">왼쪽에서 방문자를 선택하세요</div>
+        </div>
+        <div class="timeline-content" id="timelineContent">
+          <div class="timeline-empty">
+            <div style="font-size: 48px; margin-bottom: 12px;">👈</div>
+            <div>왼쪽에서 방문자를 선택하면<br>상세 행동 로그를 확인할 수 있습니다</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 통계 정보 -->
+      <div class="stats-container">
+        <div class="stats-header">
+          <h2>📊 통계 요약</h2>
+          <div class="subtitle" id="statsDate">오늘</div>
+        </div>
+        <div class="stats-content" id="statsContent">
+          <div class="stats-empty">통계 데이터를 불러오는 중...</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+      import { getFirestore, collection, query, orderBy, onSnapshot, doc, getDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCYw0ENrKZoV8r1crAK9Ej4Ac15UgI9bqs",
+        authDomain: "mcjy-77dfa.firebaseapp.com",
+        projectId: "mcjy-77dfa",
+        storageBucket: "mcjy-77dfa.firebasestorage.app",
+        messagingSenderId: "408069861706",
+        appId: "1:408069861706:web:a3ef90bcc35ccc2c5511b3",
+        measurementId: "G-J7SLHLP7PH"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      let visitors = [];
+      let selectedVisitorId = null;
+      let dailyStats = null;
+      let menuStats = null;
+      let clickStats = null;
+
+      // 시간 포맷팅
+      function formatTime(timestamp) {
+        if (!timestamp) return '시간 없음';
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
+
+      function formatFullTime(timestamp) {
+        if (!timestamp) return '시간 없음';
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+      }
+
+      // 방문자 목록 렌더링
+      function renderVisitorList() {
+        const container = document.getElementById('visitorList');
+        const countEl = document.getElementById('visitorCount');
+        
+        countEl.textContent = `${visitors.length}명`;
+
+        if (visitors.length === 0) {
+          container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">방문자가 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = visitors.map(visitor => {
+          const time = formatTime(visitor.entryTime);
+          const actionCount = visitor.actions?.length || 0;
+          const isActive = selectedVisitorId === visitor.id;
+
+          return `
+            <div class="visitor-item ${isActive ? 'active' : ''}" data-id="${visitor.id}" onclick="selectVisitor('${visitor.id}')">
+              <div class="visitor-item-time">
+                🕒 ${time}
+              </div>
+              <div class="visitor-item-info">
+                <span class="visitor-badge badge-${visitor.type.toLowerCase()}">${visitor.type}</span>
+                <span class="visitor-badge badge-${visitor.device.toLowerCase()}">${visitor.device}</span>
+                <span class="action-count">행동 ${actionCount}건</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 타임라인 렌더링
+      function renderTimeline(visitor) {
+        const container = document.getElementById('timelineContent');
+        const infoEl = document.getElementById('sessionInfo');
+
+        if (!visitor) {
+          container.innerHTML = `
+            <div class="timeline-empty">
+              <div style="font-size: 48px; margin-bottom: 12px;">👈</div>
+              <div>왼쪽에서 방문자를 선택하면<br>상세 행동 로그를 확인할 수 있습니다</div>
+            </div>
+          `;
+          infoEl.textContent = '왼쪽에서 방문자를 선택하세요';
+          return;
+        }
+
+        const entryTime = formatFullTime(visitor.entryTime);
+        const type = visitor.type;
+        const device = visitor.device;
+        const actions = visitor.actions || [];
+
+        infoEl.textContent = `입장: ${entryTime} | ${type} 접속 | ${device}`;
+
+        if (actions.length === 0) {
+          container.innerHTML = `
+            <div class="timeline-empty">
+              <div style="font-size: 48px; margin-bottom: 12px;">📭</div>
+              <div>아직 행동 로그가 없습니다</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="timeline-item">
+            <div style="position: relative;">
+              <div class="timeline-line"></div>
+              <div class="timeline-dot"></div>
+            </div>
+            <div class="timeline-content-item">
+              <div class="timeline-time">⬇️ ${entryTime}</div>
+              <div class="timeline-action">사이트 입장 (${type})</div>
+            </div>
+          </div>
+          ${actions.map(action => `
+            <div class="timeline-item">
+              <div style="position: relative;">
+                <div class="timeline-line"></div>
+                <div class="timeline-dot"></div>
+              </div>
+              <div class="timeline-content-item">
+                <div class="timeline-time">⬇️ ${action.time}</div>
+                <div class="timeline-action">${action.action}</div>
+                <div class="timeline-target">${action.target ? `[${action.target}]` : ''}</div>
+              </div>
+            </div>
+          `).join('')}
+        `;
+      }
+
+      // 방문자 선택
+      window.selectVisitor = function(visitorId) {
+        selectedVisitorId = visitorId;
+        const visitor = visitors.find(v => v.id === visitorId);
+        renderVisitorList();
+        renderTimeline(visitor);
+      };
+
+      // 통계 데이터 로드
+      async function loadStats() {
+        try {
+          const today = new Date();
+          const todayStr = today.toISOString().split('T')[0];
+          
+          // 오늘 방문 통계
+          const dailyStatsRef = doc(db, 'daily_stats', todayStr);
+          const dailyStatsSnap = await getDoc(dailyStatsRef);
+          dailyStats = dailyStatsSnap.exists() ? dailyStatsSnap.data() : null;
+
+          // 메뉴 클릭 통계
+          const menuStatsRef = doc(db, 'menu_stats', 'clicks');
+          const menuStatsSnap = await getDoc(menuStatsRef);
+          menuStats = menuStatsSnap.exists() ? menuStatsSnap.data() : null;
+
+          // 버튼 클릭 통계
+          const clickStatsRef = doc(db, 'click_stats', 'main_actions');
+          const clickStatsSnap = await getDoc(clickStatsRef);
+          clickStats = clickStatsSnap.exists() ? clickStatsSnap.data() : null;
+
+          renderStats();
+        } catch (error) {
+          console.error('통계 로드 오류:', error);
+        }
+      }
+
+      // 통계 렌더링
+      function renderStats() {
+        const container = document.getElementById('statsContent');
+        const dateEl = document.getElementById('statsDate');
+        const today = new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+        dateEl.textContent = today;
+
+        let html = '';
+
+        // 오늘 방문 통계
+        html += `
+          <div class="stats-section">
+            <h3>📈 오늘의 방문</h3>
+            ${dailyStats ? `
+              <div class="stat-item">
+                <span class="stat-label">QR 코드 유입</span>
+                <span class="stat-value">${dailyStats.qr_count || 0}명</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">일반 유입</span>
+                <span class="stat-value">${dailyStats.general_count || 0}명</span>
+              </div>
+              <div class="stat-item" style="border-top: 2px solid var(--border); margin-top: 10px; padding-top: 15px;">
+                <span class="stat-label">총 방문자</span>
+                <span class="stat-value stat-value-large">${(dailyStats.qr_count || 0) + (dailyStats.general_count || 0)}명</span>
+              </div>
+            ` : `
+              <div class="stats-empty">오늘 방문 데이터가 없습니다</div>
+            `}
+          </div>
+        `;
+
+        // 버튼 클릭 통계
+        html += `
+          <div class="stats-section">
+            <h3>🔘 버튼 클릭</h3>
+            ${clickStats ? Object.entries(clickStats)
+              .sort((a, b) => (b[1] || 0) - (a[1] || 0))
+              .map(([key, value]) => {
+                const labels = {
+                  ttaengyo: '땡겨요',
+                  baemin: '배달의민족',
+                  coupang: '쿠팡이츠',
+                  yogiyo: '요기요',
+                  public_delivery: '배달특급',
+                  phone_call: '전화하기'
+                };
+                return `
+                  <div class="stat-item">
+                    <span class="stat-label">${labels[key] || key}</span>
+                    <span class="stat-value">${value || 0}회</span>
+                  </div>
+                `;
+              }).join('') : `
+              <div class="stats-empty">버튼 클릭 데이터가 없습니다</div>
+            `}
+          </div>
+        `;
+
+        // 메뉴 클릭 통계
+        html += `
+          <div class="stats-section">
+            <h3>🍽️ 인기 메뉴</h3>
+            ${menuStats ? Object.entries(menuStats)
+              .sort((a, b) => (b[1] || 0) - (a[1] || 0))
+              .slice(0, 10)
+              .map(([menuName, count]) => `
+                <div class="stat-item">
+                  <span class="stat-label" style="font-size: 13px;">${menuName}</span>
+                  <span class="stat-value" style="font-size: 16px;">${count || 0}회</span>
+                </div>
+              `).join('') : `
+              <div class="stats-empty">메뉴 클릭 데이터가 없습니다</div>
+            `}
+          </div>
+        `;
+
+        container.innerHTML = html;
+      }
+
+      // 실시간 데이터 구독
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const q = query(
+        collection(db, 'daily_visits'),
+        orderBy('entryTime', 'desc')
+      );
+
+      onSnapshot(q, (snapshot) => {
+        visitors = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        // 오늘 날짜만 필터링
+        visitors = visitors.filter(visitor => {
+          if (!visitor.entryTime) return false;
+          const entryDate = visitor.entryTime.toDate ? visitor.entryTime.toDate() : new Date(visitor.entryTime);
+          return entryDate >= today;
+        });
+
+        renderVisitorList();
+
+        // 선택된 방문자가 있으면 타임라인 업데이트
+        if (selectedVisitorId) {
+          const visitor = visitors.find(v => v.id === selectedVisitorId);
+          if (visitor) {
+            renderTimeline(visitor);
+          }
+        }
+      }, (error) => {
+        console.error('데이터 구독 오류:', error);
+        alert('데이터를 불러오는 중 오류가 발생했습니다.');
+      });
+
+      // 통계 주기적 업데이트
+      loadStats();
+      setInterval(loadStats, 30000); // 30초마다 업데이트
+    </script>
+  </body>
+</html>
+
