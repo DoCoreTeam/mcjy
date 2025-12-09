@@ -409,7 +409,7 @@
     },
     {
       "name": "배달특급",
-      "logo": "images/delivery-express.png",
+      "logo": "images/bdtg.svg",
       "url": "https://app.specialdelivery.co.kr/customer/shareshop?shopId=S252005302",
       "enabled": true,
       "bgColor": "linear-gradient(135deg, #0066cc, #0052a3)",
