@@ -1788,5 +1788,91 @@
         unlockScroll();
       }
     </script>
+
+    <!-- Firebase Analytics & Firestore -->
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+      import { getFirestore, collection, doc, setDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+
+      // Firebase 설정 (여기에 값을 넣으세요)
+      const firebaseConfig = {
+        apiKey: "AIzaSyCYw0ENrKZoV8r1crAK9Ej4Ac15UgI9bqs",
+        authDomain: "mcjy-77dfa.firebaseapp.com",
+        projectId: "mcjy-77dfa",
+        storageBucket: "mcjy-77dfa.firebasestorage.app",
+        messagingSenderId: "408069861706",
+        appId: "1:408069861706:web:a3ef90bcc35ccc2c5511b3",
+        measurementId: "G-J7SLHLP7PH"
+      };
+
+      // Firebase 초기화
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // 모바일 기기 감지 함수
+      function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               (window.innerWidth <= 768 && window.innerWidth <= window.innerHeight);
+      }
+
+      // QR 유입 추적
+      async function trackQRVisit() {
+        try {
+          // document.referrer가 없고 모바일 기기일 경우만 추적
+          if (!document.referrer && isMobileDevice()) {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const statsRef = doc(db, 'daily_stats', today);
+            
+            // 문서가 존재하는지 확인 후 increment 또는 초기값 설정
+            const statsSnap = await getDoc(statsRef);
+            if (statsSnap.exists()) {
+              await setDoc(statsRef, { qr_count: increment(1) }, { merge: true });
+            } else {
+              await setDoc(statsRef, { qr_count: 1 });
+            }
+          }
+        } catch (error) {
+          console.error('QR 방문 추적 오류:', error);
+        }
+      }
+
+      // 메뉴 클릭 추적
+      async function trackMenuClick(menuName) {
+        try {
+          const clicksRef = doc(db, 'menu_stats', 'clicks');
+          
+          // 문서가 존재하는지 확인 후 해당 메뉴 필드 increment
+          const clicksSnap = await getDoc(clicksRef);
+          if (clicksSnap.exists()) {
+            await setDoc(clicksRef, { [menuName]: increment(1) }, { merge: true });
+          } else {
+            await setDoc(clicksRef, { [menuName]: 1 });
+          }
+        } catch (error) {
+          console.error('메뉴 클릭 추적 오류:', error);
+        }
+      }
+
+      // 페이지 로드 시 QR 유입 추적
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', trackQRVisit);
+      } else {
+        trackQRVisit();
+      }
+
+      // 메뉴 클릭 이벤트 위임 (menu-list-container에 이벤트 위임)
+      document.addEventListener('click', async (e) => {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem) {
+          const menuNameElement = menuItem.querySelector('.menu-item-name');
+          if (menuNameElement) {
+            const menuName = menuNameElement.textContent.trim();
+            if (menuName) {
+              await trackMenuClick(menuName);
+            }
+          }
+        }
+      });
+    </script>
   </body>
 </html>
